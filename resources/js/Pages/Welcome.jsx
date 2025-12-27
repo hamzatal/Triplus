@@ -119,7 +119,7 @@ const WelcomePage = () => {
                 </div>
 
                 <footer className="p-6 text-center text-gray-400 text-sm">
-                    <p>© 2024 Triplus+. All rights reserved.</p>
+                    <p>© 2025 Triplus+. All rights reserved.</p>
                 </footer>
             </div>
         </div>

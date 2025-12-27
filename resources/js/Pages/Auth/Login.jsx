@@ -96,7 +96,7 @@ export default function Login({ status }) {
     return (
         <div
             className="min-h-screen flex bg-cover bg-center bg-no-repeat relative"
-            style={{ backgroundImage: "url('/images/world.svg')" }}
+            style={{ backgroundImage: "url('/images/world.png')" }}
         >
             <Head title="Log in - Triplus" />
             <Link

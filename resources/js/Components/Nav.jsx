@@ -527,7 +527,7 @@ const Nav = ({ isDarkMode = true, wishlist = [] }) => {
                 {/* Book Now Button */}
                 <Link
                     href="/booking"
-                    className="hidden md:flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full transition-colors"
+                    className="hidden md:flex items-center bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-full transition-colors"
                 >
                     Book Now <Plane className="ml-2 w-5 h-5" />
                 </Link>

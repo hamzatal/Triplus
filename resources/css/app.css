@@ -1,0 +1,10 @@
+/* resources/css/app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to bottom right, #111827, #000000); 
+  color: #ffffff;
+}

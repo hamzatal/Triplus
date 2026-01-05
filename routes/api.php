@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\Api\HeroFallbackController;
 
 
 Route::post('/chatbot', [ChatBotController::class, 'chat']);
@@ -15,6 +16,9 @@ Route::post('/chatbot', [ChatBotController::class, 'chat']);
 |----------------------------------------------------------------------
 */
 
+
+// Hero Fallback Route        
+Route::get('/hero/fallback', [HeroFallbackController::class, 'index']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

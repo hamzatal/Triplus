@@ -203,7 +203,7 @@ const PackagesPage = ({ auth, packages = [] }) => {
 
             <div className="relative h-72 md:h-80 overflow-hidden">
                 <div className="absolute inset-0 bg-gray-900 opacity-80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.svg')] bg-no-repeat bg-center opacity-30 bg-contain"></div>
+                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center opacity-30 bg-contain"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center px-4">
                         <motion.h1

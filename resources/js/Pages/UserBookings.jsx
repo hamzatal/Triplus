@@ -471,7 +471,7 @@ const UserBookings = ({ auth }) => {
             {/* Hero Section */}
             <section className="relative h-64 w-full overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-gray-900/70 to-gray-800/70"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.svg')] bg-no-repeat bg-center opacity-30"></div>
+                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center opacity-30"></div>
                 <div className="absolute inset-0 flex items-center justify-center px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

@@ -183,7 +183,7 @@ export default function CompanyProfile() {
             {/* Hero Section (Your Original Design) */}
             <div className="relative h-64 md:h-80 overflow-hidden flex items-center justify-center">
                 <div className="absolute inset-0 bg-gray-900 opacity-80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.svg')] bg-no-repeat bg-center opacity-30 bg-cover"></div>
+                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center opacity-30 bg-cover"></div>
                 <div className="relative z-10 text-center px-4">
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}

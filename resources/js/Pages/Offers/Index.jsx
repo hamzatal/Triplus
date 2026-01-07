@@ -272,7 +272,7 @@ export default function Index({ auth, offers = [], flash = {} }) {
 
             <div className="relative h-80 md:h-96 overflow-hidden">
                 <div className="absolute inset-0 bg-gray-900 bg-opacity-80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.svg')] bg-no-repeat bg-center bg-opacity-30 bg-contain"></div>
+                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center bg-opacity-30 bg-contain"></div>
 
                 <div className="absolute inset-0">
                     <motion.div

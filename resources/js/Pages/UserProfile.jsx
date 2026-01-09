@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     User,
     Mail,
@@ -14,6 +15,11 @@ import {
     Eye,
     EyeOff,
     CheckCircle,
+    Shield,
+    Sparkles,
+    LogOut,
+    Settings,
+    Bell,
 } from "lucide-react";
 import NavBar from "../Components/Nav";
 import Footer from "../Components/Footer";
@@ -70,19 +76,12 @@ const UserProfile = () => {
                     },
                 });
                 if (!response.ok) {
-                    console.error(
-                        "HTTP Error:",
-                        response.status,
-                        response.statusText
-                    );
                     toast.error(
-                        `Failed to load profile: ${response.statusText}`,
-                        { duration: 4000 }
+                        `Failed to load profile: ${response.statusText}`
                     );
                     return;
                 }
                 const result = await response.json();
-                // console.log('Response:', result);
                 if (result.status === "success") {
                     setUser(result.user);
                     setData({
@@ -92,16 +91,11 @@ const UserProfile = () => {
                         bio: result.user.bio || "",
                         phone: result.user.phone || "",
                     });
-                    if (result.user.status) {
-                        toast.success(result.user.status, { duration: 4000 });
-                    }
                 } else {
-                    console.error("Backend Error:", result);
-                    toast.error("Failed to load profile.", { duration: 4000 });
+                    toast.error("Failed to load profile.");
                 }
             } catch (error) {
-                console.error("Fetch Error:", error);
-                toast.error("Error loading profile.", { duration: 4000 });
+                toast.error("Error loading profile.");
             }
         };
         fetchUser();
@@ -135,20 +129,14 @@ const UserProfile = () => {
                 "image/gif",
             ];
             if (!validTypes.includes(file.type)) {
-                setErrors({
-                    avatar: "The avatar must be a file of type: jpeg, png, jpg, gif.",
-                });
                 toast.error(
-                    "Invalid file type. Please upload an image (jpeg, png, jpg, gif).",
-                    { duration: 4000 }
+                    "Invalid file type. Please upload an image (jpeg, png, jpg, gif)."
                 );
                 return;
             }
             if (file.size > 2 * 1024 * 1024) {
-                setErrors({ avatar: "The avatar may not be larger than 2MB." });
                 toast.error(
-                    "File too large. Please upload an image smaller than 2MB.",
-                    { duration: 4000 }
+                    "File too large. Please upload an image smaller than 2MB."
                 );
                 return;
             }
@@ -196,18 +184,17 @@ const UserProfile = () => {
                 });
                 setIsEditing(false);
                 setPreviewImage(null);
-                toast.success(result.status, { duration: 4000 });
+                toast.success(result.status);
             } else {
                 setErrors(
                     result.errors || { general: "Failed to update profile." }
                 );
                 toast.error(
-                    "Failed to update profile. Please check the errors.",
-                    { duration: 4000 }
+                    "Failed to update profile. Please check the errors."
                 );
             }
         } catch (error) {
-            toast.error("Error updating profile.", { duration: 4000 });
+            toast.error("Error updating profile.");
         } finally {
             setProcessing(false);
         }
@@ -235,18 +222,17 @@ const UserProfile = () => {
                     password: "",
                     password_confirmation: "",
                 });
-                toast.success(result.status, { duration: 4000 });
+                toast.success(result.status);
             } else {
                 setErrors(
                     result.errors || { general: "Failed to update password." }
                 );
                 toast.error(
-                    "Failed to update password. Please check the errors.",
-                    { duration: 4000 }
+                    "Failed to update password. Please check the errors."
                 );
             }
         } catch (error) {
-            toast.error("Error updating password.", { duration: 4000 });
+            toast.error("Error updating password.");
         } finally {
             setProcessingPw(false);
         }
@@ -279,15 +265,12 @@ const UserProfile = () => {
                         general: "Failed to deactivate account.",
                     }
                 );
-                setShowDeactivationSuccessModal(false);
                 toast.error(
-                    "Failed to deactivate account. Please check the errors.",
-                    { duration: 4000 }
+                    "Failed to deactivate account. Please check the errors."
                 );
             }
         } catch (error) {
-            setShowDeactivationSuccessModal(false);
-            toast.error("Error deactivating account.", { duration: 4000 });
+            toast.error("Error deactivating account.");
         } finally {
             setProcessingDeactivate(false);
         }
@@ -302,532 +285,692 @@ const UserProfile = () => {
         previewImage ||
         (user?.avatar_url ? user.avatar_url : "/images/avatar.webp");
 
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case "profile":
-                return renderProfileTab();
-            case "security":
-                return renderSecurityTab();
-            case "account":
-                return renderAccountTab();
-            default:
-                return renderProfileTab();
-        }
-    };
-
-    const renderProfileTab = () => (
-        <form onSubmit={handleSaveProfile} className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-8">
-                {/* Avatar Section */}
-                <div className="flex flex-col items-center">
-                    <div className="relative group">
-                        <img
-                            src={displayAvatar}
-                            alt="Profile Avatar"
-                            className="w-48 h-48 rounded-full object-cover border-4 border-green-700 shadow-lg"
-                        />
-                        {isEditing && (
-                            <label className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                                <Camera className="text-white h-10 w-10" />
-                                <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/jpg,image/gif"
-                                    className="hidden"
-                                    onChange={handleAvatarUpload}
-                                />
-                            </label>
-                        )}
-                    </div>
-                    {errors.avatar && (
-                        <p className="mt-2 text-green-500 text-sm">
-                            {errors.avatar}
-                        </p>
-                    )}
-
-                    {!isEditing && user && (
-                        <div className="mt-4 text-center">
-                            <p className="text-gray-400 text-sm">
-                                Member since:{" "}
-                                {user.created_at
-                                    ? new Date(
-                                          user.created_at
-                                      ).toLocaleDateString()
-                                    : "Unknown"}
-                            </p>
-                            {user.last_login && (
-                                <p className="text-gray-400 text-sm mt-1">
-                                    Last login:{" "}
-                                    {new Date(user.last_login).toLocaleString()}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Profile Details */}
-                <div className="flex-grow space-y-6">
-                    {isEditing ? (
-                        <>
-                            <div className="flex items-center space-x-3">
-                                <User className="w-6 h-6 text-green-600" />
-                                <div className="flex-grow">
-                                    <label className="block text-sm font-medium mb-2 text-white">
-                                        Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={data.name}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                                    />
-                                    {errors.name && (
-                                        <p className="mt-2 text-green-500 text-sm">
-                                            {errors.name}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                                <Mail className="w-6 h-6 text-green-600" />
-                                <div className="flex-grow">
-                                    <label className="block text-sm font-medium mb-2 text-white">
-                                        Email
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={data.email}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                                    />
-                                    {errors.email && (
-                                        <p className="mt-2 text-green-500 text-sm">
-                                            {errors.email}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                                <Phone className="w-6 h-6 text-green-600" />
-                                <div className="flex-grow">
-                                    <label className="block text-sm font-medium mb-2 text-white">
-                                        Phone
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={data.phone}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                                    />
-                                    {errors.phone && (
-                                        <p className="mt-2 text-green-500 text-sm">
-                                            {errors.phone}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex items-start space-x-3">
-                                <FileText className="w-6 h-6 text-green-600 mt-2" />
-                                <div className="flex-grow">
-                                    <label className="block text-sm font-medium mb-2 text-white">
-                                        Bio
-                                    </label>
-                                    <textarea
-                                        name="bio"
-                                        value={data.bio}
-                                        onChange={handleInputChange}
-                                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 h-24 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                                    />
-                                    {errors.bio && (
-                                        <p className="mt-2 text-green-500 text-sm">
-                                            {errors.bio}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </>
-                    ) : (
-                        user && (
-                            <>
-                                <div>
-                                    <div className="flex items-center space-x-3">
-                                        <User className="w-6 h-6 text-green-600" />
-                                        <div>
-                                            <h2 className="text-xl font-semibold text-white">
-                                                {data.name}
-                                            </h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="flex items-center space-x-3">
-                                        <Mail className="w-6 h-6 text-green-600" />
-                                        <div>
-                                            <p className="text-md text-white">
-                                                {data.email}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                {data.phone && (
-                                    <div>
-                                        <div className="flex items-center space-x-3">
-                                            <Phone className="w-6 h-6 text-green-600" />
-                                            <div>
-                                                <p className="text-md text-white">
-                                                    {data.phone}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                                <div>
-                                    <div className="flex items-start space-x-3">
-                                        <FileText className="w-6 h-6 text-green-600 mt-1" />
-                                        <div>
-                                            <p className="text-md text-white">
-                                                {data.bio || "No bio available"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )
-                    )}
-                </div>
-            </div>
-        </form>
-    );
-
-    const renderSecurityTab = () => (
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-                <Lock className="w-6 h-6 text-green-600 mr-2" />
-                Change Password
-            </h2>
-
-            <form onSubmit={handleUpdatePassword} className="space-y-5">
-                <div className="relative">
-                    <label className="block text-sm font-medium mb-2 text-white">
-                        Current Password
-                    </label>
-                    <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        name="current_password"
-                        value={pwData.current_password}
-                        onChange={handlePasswordChange}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                    />
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setShowCurrentPassword(!showCurrentPassword)
-                        }
-                        className="absolute right-3 top-10 text-gray-400 hover:text-white"
-                    >
-                        {showCurrentPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                        ) : (
-                            <Eye className="w-5 h-5" />
-                        )}
-                    </button>
-                    {errors.current_password && (
-                        <p className="mt-2 text-green-500 text-sm">
-                            {errors.current_password}
-                        </p>
-                    )}
-                </div>
-
-                <div className="relative">
-                    <label className="block text-sm font-medium mb-2 text-white">
-                        New Password
-                    </label>
-                    <input
-                        type={showNewPassword ? "text" : "password"}
-                        name="password"
-                        value={pwData.password}
-                        onChange={handlePasswordChange}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-10 text-gray-400 hover:text-white"
-                    >
-                        {showNewPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                        ) : (
-                            <Eye className="w-5 h-5" />
-                        )}
-                    </button>
-                    {errors.password && (
-                        <p className="mt-2 text-green-500 text-sm">
-                            {errors.password}
-                        </p>
-                    )}
-                </div>
-
-                <div className="relative">
-                    <label className="block text-sm font-medium mb-2 text-white">
-                        Confirm New Password
-                    </label>
-                    <input
-                        type={showConfirmPassword ? "text" : "password"}
-                        name="password_confirmation"
-                        value={pwData.password_confirmation}
-                        onChange={handlePasswordChange}
-                        className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600 transition-all"
-                    />
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                        }
-                        className="absolute right-3 top-10 text-gray-400 hover:text-white"
-                    >
-                        {showConfirmPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                        ) : (
-                            <Eye className="w-5 h-5" />
-                        )}
-                    </button>
-                </div>
-
-                <div className="pt-4">
-                    <button
-                        type="submit"
-                        disabled={processingPw}
-                        className="bg-green-700 hover:bg-green-800 text-white font-medium px-6 py-2 rounded-lg transition-colors shadow-md flex items-center"
-                    >
-                        {processingPw ? "Updating..." : "Update Password"}
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
-
-    const renderAccountTab = () => (
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center">
-                <AlertTriangle className="w-6 h-6 text-green-600 mr-2" />
-                Account Management
-            </h2>
-
-            <div className="border border-green-800 rounded-lg p-5 bg-gray-900">
-                <h3 className="text-lg font-semibold text-green-500 mb-4">
-                    Deactivate Account
-                </h3>
-                <p className="text-gray-300 mb-4">
-                    Deactivating your account will make your profile and content
-                    inaccessible. You can reactivate your account at any time by
-                    logging in again.
-                </p>
-
-                <button
-                    onClick={() => setShowDeactivateModal(true)}
-                    className="bg-transparent hover:bg-green-900 text-green-500 border border-green-500 font-medium px-5 py-2 rounded-lg transition-colors"
-                >
-                    Deactivate Account
-                </button>
-            </div>
-        </div>
-    );
+    const tabs = [
+        { id: "profile", label: "Profile", icon: User },
+        { id: "security", label: "Security", icon: Lock },
+        { id: "account", label: "Account", icon: Settings },
+    ];
 
     return (
-        <div className="bg-gray-900 min-h-screen">
+        <div className="min-h-screen bg-gray-950 text-white">
             <Toaster position="top-right" />
-            <NavBar isDarkMode={true} />
+            <NavBar />
 
-            <div className="container mx-auto px-4 py-8 pt-24">
-                <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
-                    <div className="flex items-center justify-between mb-10">
-                        <div className="flex items-center space-x-4">
-                            <UserCircle2 className="w-10 h-10 text-green-600" />
-                            <h1 className="text-3xl font-bold text-white">
-                                Profile
-                            </h1>
+            {/* Hero Section */}
+            <section className="relative pt-32 pb-16 overflow-hidden">
+                <div className="absolute inset-0">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-600/20 rounded-full blur-3xl animate-pulse delay-1000" />
+                </div>
+
+                <div className="relative max-w-7xl mx-auto px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-center mb-8"
+                    >
+                        <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+                            <Sparkles className="w-4 h-4 text-emerald-400" />
+                            <span className="text-sm font-semibold text-emerald-400">
+                                Your Account
+                            </span>
                         </div>
-                        {activeTab === "profile" &&
-                            (!isEditing ? (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="flex items-center bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md"
-                                >
-                                    <Pen className="mr-2 h-5 w-5" /> Edit
-                                    Profile
-                                </button>
-                            ) : (
-                                <div className="flex space-x-2">
+
+                        <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+                            Profile{" "}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
+                                Settings
+                            </span>
+                        </h1>
+
+                        <p className="text-xl text-gray-400">
+                            Manage your account and preferences
+                        </p>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <section className="max-w-6xl mx-auto px-6 pb-20">
+                <div className="grid lg:grid-cols-4 gap-8">
+                    {/* Sidebar - Avatar & Tabs */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="lg:col-span-1"
+                    >
+                        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 sticky top-24">
+                            {/* Avatar Section */}
+                            <div className="text-center mb-6">
+                                <div className="relative inline-block mb-4">
+                                    <img
+                                        src={displayAvatar}
+                                        alt="Profile Avatar"
+                                        className="w-32 h-32 rounded-full object-cover border-4 border-emerald-500 shadow-lg shadow-emerald-500/20"
+                                    />
+                                    {isEditing && activeTab === "profile" && (
+                                        <label className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity rounded-full">
+                                            <Camera className="text-white w-8 h-8" />
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/jpg,image/gif"
+                                                className="hidden"
+                                                onChange={handleAvatarUpload}
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+
+                                {user && (
+                                    <>
+                                        <h2 className="text-xl font-bold mb-1">
+                                            {data.name}
+                                        </h2>
+                                        <p className="text-sm text-gray-400">
+                                            {data.email}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Tabs Navigation */}
+                            <div className="space-y-2">
+                                {tabs.map((tab) => (
                                     <button
+                                        key={tab.id}
                                         onClick={() => {
+                                            setActiveTab(tab.id);
                                             setIsEditing(false);
-                                            setPreviewImage(null);
-                                            setData((prev) => ({
-                                                ...prev,
-                                                avatar: null,
-                                            }));
                                         }}
-                                        className="flex items-center text-gray-300 hover:bg-gray-700 px-4 py-2 rounded-lg transition-all"
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                                            activeTab === tab.id
+                                                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                                                : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                                        }`}
+                                    >
+                                        <tab.icon className="w-5 h-5" />
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Member Info */}
+                            {user && (
+                                <div className="mt-6 pt-6 border-t border-gray-700 text-center text-sm text-gray-400">
+                                    <p>Member since</p>
+                                    <p className="font-semibold text-white mt-1">
+                                        {new Date(
+                                            user.created_at
+                                        ).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+
+                    {/* Main Content Area */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="lg:col-span-3"
+                    >
+                        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
+                            {/* Header with Edit Button */}
+                            {activeTab === "profile" && (
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-2xl font-bold">
+                                        Profile Information
+                                    </h2>
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => setIsEditing(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                                        >
+                                            <Pen className="w-4 h-4" />
+                                            Edit Profile
+                                        </button>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setIsEditing(false);
+                                                    setPreviewImage(null);
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        avatar: null,
+                                                    }));
+                                                }}
+                                                className="px-4 py-2 bg-gray-700 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleSaveProfile}
+                                                disabled={processing}
+                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                                            >
+                                                <Save className="w-4 h-4" />
+                                                {processing
+                                                    ? "Saving..."
+                                                    : "Save Changes"}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Tab Content */}
+                            <AnimatePresence mode="wait">
+                                {activeTab === "profile" && (
+                                    <motion.div
+                                        key="profile"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        className="space-y-6"
+                                    >
+                                        {isEditing ? (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Full Name
+                                                    </label>
+                                                    <div className="relative">
+                                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                        <input
+                                                            type="text"
+                                                            name="name"
+                                                            value={data.name}
+                                                            onChange={
+                                                                handleInputChange
+                                                            }
+                                                            className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                        />
+                                                    </div>
+                                                    {errors.name && (
+                                                        <p className="mt-1 text-red-400 text-sm">
+                                                            {errors.name}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Email Address
+                                                    </label>
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                        <input
+                                                            type="email"
+                                                            name="email"
+                                                            value={data.email}
+                                                            onChange={
+                                                                handleInputChange
+                                                            }
+                                                            className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                        />
+                                                    </div>
+                                                    {errors.email && (
+                                                        <p className="mt-1 text-red-400 text-sm">
+                                                            {errors.email}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Phone Number
+                                                    </label>
+                                                    <div className="relative">
+                                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                        <input
+                                                            type="tel"
+                                                            name="phone"
+                                                            value={data.phone}
+                                                            onChange={
+                                                                handleInputChange
+                                                            }
+                                                            className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                        />
+                                                    </div>
+                                                    {errors.phone && (
+                                                        <p className="mt-1 text-red-400 text-sm">
+                                                            {errors.phone}
+                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Bio
+                                                    </label>
+                                                    <div className="relative">
+                                                        <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                                        <textarea
+                                                            name="bio"
+                                                            value={data.bio}
+                                                            onChange={
+                                                                handleInputChange
+                                                            }
+                                                            rows="4"
+                                                            className="w-full pl-10 pr-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                                                            placeholder="Tell us about yourself..."
+                                                        />
+                                                    </div>
+                                                    {errors.bio && (
+                                                        <p className="mt-1 text-red-400 text-sm">
+                                                            {errors.bio}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            user && (
+                                                <div className="space-y-6">
+                                                    <div className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-xl">
+                                                        <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                                                            <User className="w-6 h-6 text-emerald-400" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-400">
+                                                                Full Name
+                                                            </p>
+                                                            <p className="text-lg font-semibold">
+                                                                {data.name}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-xl">
+                                                        <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                                                            <Mail className="w-6 h-6 text-emerald-400" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-400">
+                                                                Email Address
+                                                            </p>
+                                                            <p className="text-lg font-semibold">
+                                                                {data.email}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {data.phone && (
+                                                        <div className="flex items-center gap-4 p-4 bg-gray-900/50 rounded-xl">
+                                                            <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                                                                <Phone className="w-6 h-6 text-emerald-400" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm text-gray-400">
+                                                                    Phone Number
+                                                                </p>
+                                                                <p className="text-lg font-semibold">
+                                                                    {data.phone}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex items-start gap-4 p-4 bg-gray-900/50 rounded-xl">
+                                                        <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                            <FileText className="w-6 h-6 text-emerald-400" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-400 mb-1">
+                                                                Bio
+                                                            </p>
+                                                            <p className="text-gray-300">
+                                                                {data.bio ||
+                                                                    "No bio available"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        )}
+                                    </motion.div>
+                                )}
+
+                                {activeTab === "security" && (
+                                    <motion.div
+                                        key="security"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                    >
+                                        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+                                            <Lock className="w-6 h-6 text-emerald-400" />
+                                            Change Password
+                                        </h2>
+
+                                        <form
+                                            onSubmit={handleUpdatePassword}
+                                            className="space-y-6"
+                                        >
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Current Password
+                                                </label>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                    <input
+                                                        type={
+                                                            showCurrentPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="current_password"
+                                                        value={
+                                                            pwData.current_password
+                                                        }
+                                                        onChange={
+                                                            handlePasswordChange
+                                                        }
+                                                        className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowCurrentPassword(
+                                                                !showCurrentPassword
+                                                            )
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                                    >
+                                                        {showCurrentPassword ? (
+                                                            <EyeOff className="w-5 h-5" />
+                                                        ) : (
+                                                            <Eye className="w-5 h-5" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                {errors.current_password && (
+                                                    <p className="mt-1 text-red-400 text-sm">
+                                                        {
+                                                            errors.current_password
+                                                        }
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    New Password
+                                                </label>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                    <input
+                                                        type={
+                                                            showNewPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password"
+                                                        value={pwData.password}
+                                                        onChange={
+                                                            handlePasswordChange
+                                                        }
+                                                        className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowNewPassword(
+                                                                !showNewPassword
+                                                            )
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                                    >
+                                                        {showNewPassword ? (
+                                                            <EyeOff className="w-5 h-5" />
+                                                        ) : (
+                                                            <Eye className="w-5 h-5" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                {errors.password && (
+                                                    <p className="mt-1 text-red-400 text-sm">
+                                                        {errors.password}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Confirm New Password
+                                                </label>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                    <input
+                                                        type={
+                                                            showConfirmPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password_confirmation"
+                                                        value={
+                                                            pwData.password_confirmation
+                                                        }
+                                                        onChange={
+                                                            handlePasswordChange
+                                                        }
+                                                        className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowConfirmPassword(
+                                                                !showConfirmPassword
+                                                            )
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                                    >
+                                                        {showConfirmPassword ? (
+                                                            <EyeOff className="w-5 h-5" />
+                                                        ) : (
+                                                            <Eye className="w-5 h-5" />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                disabled={processingPw}
+                                                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                            >
+                                                <Shield className="w-5 h-5" />
+                                                {processingPw
+                                                    ? "Updating..."
+                                                    : "Update Password"}
+                                            </button>
+                                        </form>
+                                    </motion.div>
+                                )}
+
+                                {activeTab === "account" && (
+                                    <motion.div
+                                        key="account"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                    >
+                                        <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+                                            <Settings className="w-6 h-6 text-emerald-400" />
+                                            Account Management
+                                        </h2>
+
+                                        <div className="bg-red-900/20 border border-red-500/30 rounded-2xl p-6">
+                                            <div className="flex items-start gap-4 mb-6">
+                                                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-red-400 mb-2">
+                                                        Deactivate Account
+                                                    </h3>
+                                                    <p className="text-gray-300 mb-4">
+                                                        Deactivating your
+                                                        account will make your
+                                                        profile and content
+                                                        inaccessible. You can
+                                                        reactivate your account
+                                                        at any time by logging
+                                                        in again.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={() =>
+                                                    setShowDeactivateModal(true)
+                                                }
+                                                className="w-full py-3 px-4 bg-transparent border-2 border-red-500 text-red-400 rounded-xl font-semibold hover:bg-red-500/10 transition-all"
+                                            >
+                                                Deactivate Account
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Deactivate Modal */}
+            <AnimatePresence>
+                {showDeactivateModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                        onClick={() => setShowDeactivateModal(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-gray-800 border border-gray-700 rounded-2xl max-w-md w-full p-6"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+                                    <AlertTriangle className="w-6 h-6 text-red-400" />
+                                </div>
+                                <h3 className="text-xl font-bold">
+                                    Deactivate Account
+                                </h3>
+                            </div>
+
+                            <form
+                                onSubmit={handleDeactivateAccount}
+                                className="space-y-4"
+                            >
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Confirm Password
+                                    </label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type={
+                                                showDeactivatePassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            name="password"
+                                            value={deactivateData.password}
+                                            onChange={handleDeactivateChange}
+                                            required
+                                            className="w-full pl-10 pr-12 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowDeactivatePassword(
+                                                    !showDeactivatePassword
+                                                )
+                                            }
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                        >
+                                            {showDeactivatePassword ? (
+                                                <EyeOff className="w-5 h-5" />
+                                            ) : (
+                                                <Eye className="w-5 h-5" />
+                                            )}
+                                        </button>
+                                    </div>
+                                    {errors.password && (
+                                        <p className="mt-1 text-red-400 text-sm">
+                                            {errors.password}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Reason for Deactivation (Optional)
+                                    </label>
+                                    <textarea
+                                        name="deactivation_reason"
+                                        value={
+                                            deactivateData.deactivation_reason
+                                        }
+                                        onChange={handleDeactivateChange}
+                                        rows="3"
+                                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                                        placeholder="Tell us why you're leaving..."
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowDeactivateModal(false)
+                                        }
+                                        className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all"
                                     >
                                         Cancel
                                     </button>
                                     <button
-                                        onClick={handleSaveProfile}
-                                        disabled={processing}
-                                        className="flex items-center bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105 shadow-md"
+                                        type="submit"
+                                        disabled={processingDeactivate}
+                                        className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all disabled:opacity-50"
                                     >
-                                        <Save className="mr-2 h-5 w-5" />{" "}
-                                        {processing
-                                            ? "Saving..."
-                                            : "Save Changes"}
+                                        {processingDeactivate
+                                            ? "Processing..."
+                                            : "Deactivate"}
                                     </button>
                                 </div>
-                            ))}
-                    </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                    {/* Tabs Navigation */}
-                    <div className="flex border-b border-gray-700 mb-6">
-                        <button
-                            onClick={() => setActiveTab("profile")}
-                            className={`py-3 px-5 font-medium ${
-                                activeTab === "profile"
-                                    ? "text-green-500 border-b-2 border-green-500"
-                                    : "text-gray-400 hover:text-white"
-                            }`}
+            {/* Success Modal */}
+            <AnimatePresence>
+                {showDeactivationSuccessModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-gray-800 border border-emerald-500/30 rounded-2xl max-w-md w-full p-8 text-center"
                         >
-                            Profile
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("security")}
-                            className={`py-3 px-5 font-medium ${
-                                activeTab === "security"
-                                    ? "text-green-500 border-b-2 border-green-500"
-                                    : "text-gray-400 hover:text-white"
-                            }`}
-                        >
-                            Security
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("account")}
-                            className={`py-3 px-5 font-medium ${
-                                activeTab === "account"
-                                    ? "text-green-500 border-b-2 border-green-500"
-                                    : "text-gray-400 hover:text-white"
-                            }`}
-                        >
-                            Account
-                        </button>
-                    </div>
-
-                    {/* Tab Content */}
-                    {renderTabContent()}
-                </div>
-            </div>
-
-            {/* Deactivate Account Modal */}
-            {showDeactivateModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-700">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold text-white">
-                                Deactivate Account
-                            </h3>
-                            <button
-                                onClick={() => setShowDeactivateModal(false)}
-                                className="text-gray-400 hover:text-white"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleDeactivateAccount}>
-                            <div className="mb-4 relative">
-                                <label className="block text-sm font-medium mb-2 text-white">
-                                    Password
-                                </label>
-                                <input
-                                    type={
-                                        showDeactivatePassword
-                                            ? "text"
-                                            : "password"
-                                    }
-                                    name="password"
-                                    value={deactivateData.password}
-                                    onChange={handleDeactivateChange}
-                                    required
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowDeactivatePassword(
-                                            !showDeactivatePassword
-                                        )
-                                    }
-                                    className="absolute right-3 top-10 text-gray-400 hover:text-white"
-                                >
-                                    {showDeactivatePassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
-                                {errors.password && (
-                                    <p className="mt-2 text-green-500 text-sm">
-                                        {errors.password}
-                                    </p>
-                                )}
+                            <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <CheckCircle className="w-10 h-10 text-emerald-400" />
                             </div>
 
-                            <div className="mb-6">
-                                <label className="block text-sm font-medium mb-2 text-white">
-                                    Reason for deactivation (optional)
-                                </label>
-                                <textarea
-                                    name="deactivation_reason"
-                                    value={deactivateData.deactivation_reason}
-                                    onChange={handleDeactivateChange}
-                                    rows="3"
-                                    className="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-green-600"
-                                ></textarea>
-                            </div>
-
-                            <div className="flex justify-end space-x-3">
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setShowDeactivateModal(false)
-                                    }
-                                    className="px-4 py-2 text-gray-300 hover:text-white"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={processingDeactivate}
-                                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
-                                >
-                                    {processingDeactivate
-                                        ? "Processing..."
-                                        : "Deactivate Account"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Deactivation Success Modal */}
-            {showDeactivationSuccessModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-green-700 shadow-xl">
-                        <div className="text-center">
-                            <div className="flex justify-center mb-4">
-                                <CheckCircle className="w-16 h-16 text-green-500" />
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-4">
+                            <h3 className="text-2xl font-bold mb-4">
                                 Account Deactivated
                             </h3>
                             <p className="text-gray-300 mb-6">
@@ -835,36 +978,39 @@ const UserProfile = () => {
                                 If you need any assistance, please contact our
                                 support team:
                             </p>
-                            <div className="bg-gray-900 rounded-lg p-4 mb-6 border border-gray-700">
-                                <div className="flex items-center space-x-3 mb-3">
-                                    <Phone className="w-5 h-5 text-green-500" />
-                                    <p className="text-gray-300">
-                                        <span className="font-medium text-white">
+
+                            <div className="bg-gray-900/50 rounded-xl p-4 mb-6 space-y-3 text-left">
+                                <div className="flex items-center gap-3">
+                                    <Phone className="w-5 h-5 text-emerald-400" />
+                                    <span className="text-gray-300">
+                                        <strong className="text-white">
                                             Phone:
-                                        </span>{" "}
+                                        </strong>{" "}
                                         +1234567890
-                                    </p>
+                                    </span>
                                 </div>
-                                <div className="flex items-center space-x-3">
-                                    <Mail className="w-5 h-5 text-green-500" />
-                                    <p className="text-gray-300">
-                                        <span className="font-medium text-white">
+                                <div className="flex items-center gap-3">
+                                    <Mail className="w-5 h-5 text-emerald-400" />
+                                    <span className="text-gray-300">
+                                        <strong className="text-white">
                                             Email:
-                                        </span>{" "}
+                                        </strong>{" "}
                                         Triplus@support.com
-                                    </p>
+                                    </span>
                                 </div>
                             </div>
+
                             <button
                                 onClick={handleDeactivationSuccessClose}
-                                className="bg-green-700 hover:bg-green-800 text-white font-medium px-6 py-3 rounded-lg transition-colors shadow-md flex items-center justify-center w-full"
+                                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
                             >
                                 OK
                             </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <Footer />
         </div>
     );

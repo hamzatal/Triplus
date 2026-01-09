@@ -35,10 +35,8 @@ const NavV2 = ({ isDarkMode = true, wishlist = [] }) => {
     const { auth } = props;
 
     const [scrolled, setScrolled] = useState(false);
-
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
-
     const [searchOpen, setSearchOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [searching, setSearching] = useState(false);
@@ -137,13 +135,17 @@ const NavV2 = ({ isDarkMode = true, wishlist = [] }) => {
         []
     );
 
-    // Detect company-user shape (same idea as your code)
+    // ✅ حساب effectiveUser و effectiveCompany
     const isCompanyUser =
         auth?.user && (auth.user.company_name || auth.user.license_number);
     const effectiveUser = isCompanyUser ? null : auth?.user;
     const effectiveCompany = isCompanyUser ? auth?.user : auth?.company;
 
-    const avatarUrl = effectiveUser?.avatar_url || "/images/avatar.webp";
+    // ✅ حساب avatarUrl بشكل مباشر (بدون useMemo)
+    let avatarUrl = "/images/avatar.webp";
+    if (effectiveUser?.avatar_url) {
+        avatarUrl = `${effectiveUser.avatar_url}?t=${Date.now()}`;
+    }
 
     const closeAllOverlays = useCallback(() => {
         setMobileOpen(false);
@@ -162,8 +164,7 @@ const NavV2 = ({ isDarkMode = true, wishlist = [] }) => {
     // Close overlays on route change
     useEffect(() => {
         closeAllOverlays();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [url]);
+    }, [url, closeAllOverlays]);
 
     // Click outside
     useEffect(() => {
@@ -320,6 +321,7 @@ const NavV2 = ({ isDarkMode = true, wishlist = [] }) => {
                             src={avatarUrl}
                             alt="Avatar"
                             className="h-full w-full object-cover"
+                            key={avatarUrl}
                         />
                     ) : (
                         <div className="grid h-full w-full place-items-center">
@@ -556,7 +558,8 @@ const NavV2 = ({ isDarkMode = true, wishlist = [] }) => {
                                     )
                                 ) : (
                                     <div className="px-4 py-4 text-sm text-white/50">
-                                        Tip: اكتب اسم وجهة أو باكج أو عرض…
+                                        Tip: Search for deals, destinations, or
+                                        offers.
                                     </div>
                                 )}
                             </div>

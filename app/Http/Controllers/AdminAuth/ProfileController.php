@@ -18,11 +18,17 @@ class ProfileController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
+        $avatarUrl = $admin->image ? Storage::url($admin->image) : null;
+
+        if ($avatarUrl) {
+            $avatarUrl .= '?v=' . $admin->updated_at?->timestamp ?? time();
+        }
+
         return response()->json([
-            'id' => $admin->id,
-            'name' => $admin->name,
-            'email' => $admin->email,
-            'avatar' => $admin->image ? Storage::url($admin->image) : null,
+            'id'         => $admin->id,
+            'name'       => $admin->name,
+            'email'      => $admin->email,
+            'avatar'     => $avatarUrl,
             'last_login' => $admin->last_login,
         ]);
     }
@@ -35,18 +41,18 @@ class ProfileController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:admins,email,' . $admin->id,
+            'name'            => 'required|string|max:255',
+            'email'           => 'required|email|max:255|unique:admins,email,' . $admin->id,
             'currentPassword' => 'nullable|string|required_with:newPassword',
-            'newPassword' => 'nullable|string|min:8|confirmed',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'newPassword'     => 'nullable|string|min:8|confirmed',
+            'avatar'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $admin->name = $validated['name'];
+        $admin->name  = $validated['name'];
         $admin->email = $validated['email'];
 
         if ($request->filled('currentPassword') && $request->filled('newPassword')) {
-            if (!Hash::check($request->currentPassword, $admin->password)) {
+            if (! Hash::check($request->currentPassword, $admin->password)) {
                 return response()->json(['error' => 'Current password is incorrect'], 422);
             }
             $admin->password = Hash::make($validated['newPassword']);
@@ -62,13 +68,18 @@ class ProfileController extends Controller
 
         $admin->save();
 
+        $avatarUrl = $admin->image ? Storage::url($admin->image) : null;
+
+        if ($avatarUrl) {
+            $avatarUrl .= '?v=' . ($admin->updated_at?->timestamp ?? time());
+        }
+
         return response()->json([
-            'id' => $admin->id,
-            'name' => $admin->name,
-            'email' => $admin->email,
-            'avatar' => $admin->image ? Storage::url($admin->image) : null,
+            'id'         => $admin->id,
+            'name'       => $admin->name,
+            'email'      => $admin->email,
+            'avatar'     => $avatarUrl,
             'last_login' => $admin->last_login,
-            'message' => 'Profile updated successfully',
         ]);
     }
 }

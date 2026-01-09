@@ -69,6 +69,13 @@ class ProfileController extends Controller
             }
 
             $user->save();
+            // Refresh avatar cache
+            if ($request->hasFile('avatar')) {
+                $user->avatar_url = Storage::url($user->avatar);
+                // Clear any cache
+                cache()->forget("user_{$user->id}");
+            }
+
             Log::info('User updated:', [
                 'id' => $user->id,
                 'avatar' => $user->avatar,

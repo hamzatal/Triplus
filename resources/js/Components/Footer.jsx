@@ -40,7 +40,7 @@ const LegalPopup = ({ type, onClose }) => {
 
         **6. Contact Us**
         If you have any questions about this Privacy Policy, please contact us:
-        • By email: support@Triplus.com
+        • By email: [support@Triplus.com](mailto:support@Triplus.com)
         • By phone: +1 (123) 456-7890
       `,
         },
@@ -76,7 +76,7 @@ const LegalPopup = ({ type, onClose }) => {
 
         **9. Contact Us**
         If you have any questions about these terms and conditions, please contact us:
-        • By email: support@Triplus.com
+        • By email: [support@Triplus.com](mailto:support@Triplus.com)
         • By phone: +1 (123) 456-7890
       `,
         },
@@ -146,13 +146,17 @@ const Footer = () => {
             <motion.footer
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="relative py-4 mt-12 text-center"
+                className="relative py-4 mt-12 text-center overflow-hidden bg-gray-950"
             >
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: "url('/images/world.png')" }}
-                />
-                <div className="absolute inset-0 bg-black opacity-50" />
+                {/* Fade-in gradient overlay - يبدأ من شفاف لتحت */}
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-emerald-950/5 to-gray-950" />
+
+                {/* Very subtle gradient circles */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute -top-20 left-1/4 w-96 h-96 bg-emerald-600 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-20 right-1/4 w-96 h-96 bg-emerald-700 rounded-full blur-3xl" />
+                </div>
+
                 <div className="relative z-10">
                     <p className="text-white text-sm">
                         © 2025 Triplus. All rights reserved.
@@ -160,25 +164,25 @@ const Footer = () => {
                     <div className="mt-10 space-x-6">
                         <button
                             onClick={() => setActivePopup("privacyPolicy")}
-                            className="text-white text-sm hover:bg-green-500/20 hover:text-green-500 rounded-full px-3 py-1 transition-all duration-300"
+                            className="text-white text-sm hover:bg-emerald-500/20 hover:text-emerald-400 rounded-full px-3 py-1 transition-all duration-300"
                         >
                             Privacy Policy
                         </button>
                         <button
                             onClick={() => setActivePopup("termsOfService")}
-                            className="text-white text-sm hover:bg-green-500/20 hover:text-green-500 rounded-full px-3 py-1 transition-all duration-300"
+                            className="text-white text-sm hover:bg-emerald-500/20 hover:text-emerald-400 rounded-full px-3 py-1 transition-all duration-300"
                         >
                             Terms of Service
                         </button>
                         <a
                             href="/ContactPage"
-                            className="text-white text-sm hover:bg-green-500/20 hover:text-green-500 rounded-full px-3 py-1 transition-all duration-300"
+                            className="text-white text-sm hover:bg-emerald-500/20 hover:text-emerald-400 rounded-full px-3 py-1 transition-all duration-300"
                         >
                             Contact
                         </a>
                         <a
                             href="/about-us"
-                            className="text-white text-sm hover:bg-green-500/20 hover:text-green-500 rounded-full px-3 py-1 transition-all duration-300"
+                            className="text-white text-sm hover:bg-emerald-500/20 hover:text-emerald-400 rounded-full px-3 py-1 transition-all duration-300"
                         >
                             About Us
                         </a>

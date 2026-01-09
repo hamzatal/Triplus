@@ -34,7 +34,7 @@ class OfferController extends Controller
                     'discount_type' => $offer->discount_type ?? '',
                     'start_date' => $offer->start_date ? $offer->start_date->format('Y-m-d') : null,
                     'end_date' => $offer->end_date ? $offer->end_date->format('Y-m-d') : null,
-                    'image' => $offer->image ? Storage::url($offer->image) : null,
+                    'image' => $offer->image, // شيل Storage::url() من هون
                     'description' => $offer->description ?? '',
                     'rating' => $offer->rating ?? 0.0,
                     'is_active' => $offer->is_active ?? false,
@@ -62,6 +62,7 @@ class OfferController extends Controller
         ]);
     }
 
+
     public function show($id)
     {
         $user = Auth::user();
@@ -87,7 +88,7 @@ class OfferController extends Controller
             'discount_type' => $offer->discount_type ?? '',
             'start_date' => $offer->start_date ? $offer->start_date->format('Y-m-d') : null,
             'end_date' => $offer->end_date ? $offer->end_date->format('Y-m-d') : null,
-            'image' => $offer->image ? Storage::url($offer->image) : null,
+            'image' => $offer->image ? $offer->image : null,
             'description' => $offer->description ?? '',
             'rating' => $offer->rating ?? 0.0,
             'is_active' => $offer->is_active ?? false,

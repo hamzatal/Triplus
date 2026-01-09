@@ -215,8 +215,9 @@ export default function Index({ auth, offers = [], flash = {} }) {
         currentPage * itemsPerPage
     );
 
-    const baseUrl = "/storage/";
 
+
+    const baseUrl = ""; // Set your base URL if needed
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery, selectedCategories]);

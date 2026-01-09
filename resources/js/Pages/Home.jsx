@@ -39,7 +39,7 @@ import Navbar from "../Components/Nav";
 import Footer from "../Components/Footer";
 import ChatBot from "../Components/ChatBot";
 
-// Offer Card Component
+// New Unique Offer Card Design
 const OfferCard = React.memo(
     ({
         offer,
@@ -50,190 +50,194 @@ const OfferCard = React.memo(
         favorites,
         loadingFavorite,
     }) => {
+        const discount = calculateDiscount(offer.price, offer.discount_price);
+
         return (
             <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className={`rounded-2xl overflow-hidden shadow-lg ${
-                    isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-gray-200"
-                } border hover:shadow-xl transition-all duration-300 group flex flex-col h-full`}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`group rounded-2xl overflow-hidden ${
+                    isDarkMode ? "bg-gray-800" : "bg-white"
+                } shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full`}
             >
-                <div className="relative overflow-hidden h-56">
+                {/* Image Section */}
+                <div className="relative overflow-hidden aspect-[4/3]">
                     <img
                         src={offer.image || "/images/placeholder-offer.jpg"}
                         alt={offer.title}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                         onError={(e) =>
                             (e.target.src = "/images/placeholder-offer.jpg")
                         }
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                        {offer.category && (
-                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
-                                {offer.category}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+                    {/* Discount Badge - Top Right - Eye-catching */}
+                    {discount && (
+                        <div className="absolute top-0 right-0">
+                            <div className="relative">
+                                <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white px-4 py-3 rounded-bl-2xl shadow-2xl">
+                                    <div className="text-center">
+                                        <div className="text-2xl font-black leading-none">
+                                            {discount}%
+                                        </div>
+                                        <div className="text-[10px] font-bold uppercase tracking-wide">
+                                            OFF
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Category & Favorite - Bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                        {offer.category && (
+                            <span className="inline-block bg-white/95 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                {offer.category}
+                            </span>
                         )}
                         <button
                             onClick={() => toggleFavorite(offer.id, "offer_id")}
                             disabled={loadingFavorite[`offer_${offer.id}`]}
-                            className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${
+                            className={`p-2.5 rounded-xl backdrop-blur-sm transition-all ${
                                 favorites[`offer_${offer.id}`]?.is_favorite
-                                    ? "bg-red-500 hover:bg-red-600 shadow-lg"
-                                    : "bg-white/20 hover:bg-white/40"
+                                    ? "bg-red-500 scale-110"
+                                    : "bg-white/90 hover:bg-white"
                             } ${
                                 loadingFavorite[`offer_${offer.id}`]
-                                    ? "opacity-50 cursor-not-allowed"
+                                    ? "opacity-50"
                                     : ""
                             }`}
-                            aria-label={
-                                favorites[`offer_${offer.id}`]?.is_favorite
-                                    ? "Remove from favorites"
-                                    : "Add to favorites"
-                            }
+                            aria-label="Toggle favorite"
                         >
                             <Heart
                                 size={18}
                                 className={
                                     favorites[`offer_${offer.id}`]?.is_favorite
                                         ? "text-white fill-white"
-                                        : "text-white"
+                                        : "text-gray-700"
                                 }
                             />
                         </button>
                     </div>
-                    {calculateDiscount(offer.price, offer.discount_price) && (
-                        <div className="absolute top-16 right-0 bg-gradient-to-r from-red-600 to-pink-600 text-white px-3 py-1 rounded-l-full text-xs font-bold shadow-lg">
-                            {calculateDiscount(
-                                offer.price,
-                                offer.discount_price
-                            )}
-                            % OFF
-                        </div>
-                    )}
                 </div>
-                <div className="p-4 flex flex-col flex-grow">
-                    <div className="mb-2">
-                        <h3
-                            className={`text-lg font-semibold ${
-                                isDarkMode ? "text-white" : "text-gray-900"
-                            } line-clamp-1`}
+
+                {/* Content Section */}
+                <div className="p-5 flex flex-col flex-grow">
+                    {/* Title */}
+                    <h3
+                        className={`text-xl font-bold mb-3 ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                        } line-clamp-1 group-hover:text-blue-600 transition-colors`}
+                    >
+                        {offer.title}
+                    </h3>
+
+                    {/* Location */}
+                    <div className="flex items-center gap-2 mb-3">
+                        <div
+                            className={`p-1.5 rounded-lg ${
+                                isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                            }`}
                         >
-                            {offer.title}
-                        </h3>
-                        <p
-                            className={`text-sm ${
+                            <MapPin size={14} className="text-blue-600" />
+                        </div>
+                        <span
+                            className={`text-sm font-medium ${
                                 isDarkMode ? "text-gray-300" : "text-gray-600"
                             } line-clamp-1`}
                         >
-                            {offer.company_name || "Triplus"}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <MapPin
-                                size={14}
-                                className="text-blue-600 flex-shrink-0"
-                            />
-                            <span
-                                className={`text-sm ${
-                                    isDarkMode
-                                        ? "text-gray-300"
-                                        : "text-gray-600"
-                                } line-clamp-1`}
-                            >
-                                {offer.destination_location}
-                            </span>
-                        </div>
+                            {offer.destination_location}
+                        </span>
                     </div>
-                    {offer.description && (
-                        <p
-                            className={`text-sm ${
-                                isDarkMode ? "text-gray-400" : "text-gray-500"
-                            } mb-3 line-clamp-2`}
-                        >
-                            {offer.description}
-                        </p>
-                    )}
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center">
-                            <Calendar
-                                size={14}
-                                className={
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
+
+                    {/* Dates */}
+                    <div
+                        className={`flex items-center gap-2 mb-4 text-xs ${
+                            isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                    >
+                        <Calendar size={13} />
+                        <span>
+                            {new Date(offer.start_date).toLocaleDateString(
+                                "en-US",
+                                {
+                                    month: "short",
+                                    day: "numeric",
                                 }
-                            />
-                            <span
-                                className={`text-xs ${
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                } ml-1`}
-                            >
-                                {new Date(
-                                    offer.start_date
-                                ).toLocaleDateString() || "N/A"}{" "}
-                                -{" "}
-                                {new Date(
-                                    offer.end_date
-                                ).toLocaleDateString() || "N/A"}
-                            </span>
-                        </div>
+                            )}{" "}
+                            -{" "}
+                            {new Date(offer.end_date).toLocaleDateString(
+                                "en-US",
+                                {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                }
+                            )}
+                        </span>
                     </div>
-                    <div className="mt-auto">
-                        <div
-                            className={`flex items-center justify-between pt-3 border-t ${
-                                isDarkMode
-                                    ? "border-gray-700"
-                                    : "border-gray-200"
-                            }`}
-                        >
-                            <div>
-                                <span
-                                    className={`block text-xs font-medium ${
+
+                    {/* Price & CTA Section - Redesigned for Perfect Alignment */}
+                    <div
+                        className={`mt-auto pt-4 border-t ${
+                            isDarkMode ? "border-gray-700" : "border-gray-200"
+                        }`}
+                    >
+                        <div className="flex items-center justify-between gap-3">
+                            {/* Price Column */}
+                            <div className="flex-1">
+                                <div
+                                    className={`text-xs font-semibold uppercase tracking-wider mb-1 ${
                                         isDarkMode
                                             ? "text-gray-400"
                                             : "text-gray-500"
                                     }`}
                                 >
-                                    {translations.starting_from ||
-                                        "Starting from"}
-                                </span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-blue-600 font-bold text-base">
+                                    {translations.starting_from || "From"}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl font-black text-blue-600">
                                         ${offer.discount_price || offer.price}
                                     </span>
                                     {offer.discount_price && (
-                                        <span
-                                            className={`text-xs ${
-                                                isDarkMode
-                                                    ? "text-gray-500"
-                                                    : "text-gray-400"
-                                            } line-through`}
-                                        >
-                                            ${offer.price}
-                                        </span>
+                                        <div className="flex flex-col">
+                                            <span
+                                                className={`text-xs line-through ${
+                                                    isDarkMode
+                                                        ? "text-gray-500"
+                                                        : "text-gray-400"
+                                                }`}
+                                            >
+                                                ${offer.price}
+                                            </span>
+                                        </div>
                                     )}
-                                    <span
-                                        className={`text-xs ${
-                                            isDarkMode
-                                                ? "text-gray-400"
-                                                : "text-gray-500"
-                                        }`}
-                                    >
-                                        {translations.per_night || "/ night"}
-                                    </span>
+                                </div>
+                                <div
+                                    className={`text-xs ${
+                                        isDarkMode
+                                            ? "text-gray-400"
+                                            : "text-gray-500"
+                                    }`}
+                                >
+                                    {translations.per_night || "per night"}
                                 </div>
                             </div>
+
+                            {/* CTA Button */}
                             <Link
                                 href={`/offers/${offer.id}`}
-                                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 text-sm font-medium shadow-md hover:shadow-lg"
-                                aria-label={`View ${offer.title} details`}
+                                className="shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 text-sm font-bold shadow-sm hover:shadow-md group/btn"
+                                aria-label={`View ${offer.title}`}
                             >
-                                {translations.details || "Details"}
-                                <ArrowRight size={16} />
+                                View
+                                <ArrowRight
+                                    size={16}
+                                    className="group-hover/btn:translate-x-0.5 transition-transform"
+                                />
                             </Link>
                         </div>
                     </div>
@@ -243,7 +247,7 @@ const OfferCard = React.memo(
     }
 );
 
-// Destination Card Component
+// New Unique Destination Card Design
 const DestinationCard = React.memo(
     ({
         destination,
@@ -254,35 +258,60 @@ const DestinationCard = React.memo(
         favorites,
         loadingFavorite,
     }) => {
+        const discount = calculateDiscount(
+            destination.price,
+            destination.discount_price
+        );
+
         return (
             <motion.div
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className={`rounded-2xl overflow-hidden shadow-lg ${
-                    isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-gray-200"
-                } border hover:shadow-xl transition-all duration-300 group flex flex-col h-full`}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`group rounded-2xl overflow-hidden ${
+                    isDarkMode ? "bg-gray-800" : "bg-white"
+                } shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full`}
             >
-                <div className="relative overflow-hidden h-56">
+                {/* Image Section */}
+                <div className="relative overflow-hidden aspect-[4/3]">
                     <img
                         src={
                             destination.image ||
                             "/images/placeholder-destination.jpg"
                         }
                         alt={destination.title}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                         onError={(e) =>
                             (e.target.src =
                                 "/images/placeholder-destination.jpg")
                         }
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
-                    <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                        {destination.category && (
-                            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
-                                {destination.category}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+                    {/* Discount Badge - Top Right - Eye-catching */}
+                    {discount && (
+                        <div className="absolute top-0 right-0">
+                            <div className="relative">
+                                <div className="bg-gradient-to-br from-orange-500 to-red-600 text-white px-4 py-3 rounded-bl-2xl shadow-2xl">
+                                    <div className="text-center">
+                                        <div className="text-2xl font-black leading-none">
+                                            {discount}%
+                                        </div>
+                                        <div className="text-[10px] font-bold uppercase tracking-wide">
+                                            OFF
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Category & Favorite - Bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 flex items-end justify-between">
+                        {destination.category && (
+                            <span className="inline-block bg-white/95 backdrop-blur-sm text-gray-900 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                {destination.category}
+                            </span>
                         )}
                         <button
                             onClick={() =>
@@ -291,22 +320,17 @@ const DestinationCard = React.memo(
                             disabled={
                                 loadingFavorite[`destination_${destination.id}`]
                             }
-                            className={`p-2 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110 ${
+                            className={`p-2.5 rounded-xl backdrop-blur-sm transition-all ${
                                 favorites[`destination_${destination.id}`]
                                     ?.is_favorite
-                                    ? "bg-red-500 hover:bg-red-600 shadow-lg"
-                                    : "bg-white/20 hover:bg-white/40"
+                                    ? "bg-red-500 scale-110"
+                                    : "bg-white/90 hover:bg-white"
                             } ${
                                 loadingFavorite[`destination_${destination.id}`]
-                                    ? "opacity-50 cursor-not-allowed"
+                                    ? "opacity-50"
                                     : ""
                             }`}
-                            aria-label={
-                                favorites[`destination_${destination.id}`]
-                                    ?.is_favorite
-                                    ? "Remove from favorites"
-                                    : "Add to favorites"
-                            }
+                            aria-label="Toggle favorite"
                         >
                             <Heart
                                 size={18}
@@ -314,150 +338,127 @@ const DestinationCard = React.memo(
                                     favorites[`destination_${destination.id}`]
                                         ?.is_favorite
                                         ? "text-white fill-white"
-                                        : "text-white"
+                                        : "text-gray-700"
                                 }
                             />
                         </button>
                     </div>
-                    {calculateDiscount(
-                        destination.price,
-                        destination.discount_price
-                    ) && (
-                        <div className="absolute top-16 right-0 bg-gradient-to-r from-red-600 to-pink-600 text-white px-3 py-1 rounded-l-full text-xs font-bold shadow-lg">
-                            {calculateDiscount(
-                                destination.price,
-                                destination.discount_price
-                            )}
-                            % OFF
-                        </div>
-                    )}
                 </div>
-                <div className="p-4 flex flex-col flex-grow">
-                    <div className="mb-2">
-                        <h3
-                            className={`text-lg font-semibold ${
-                                isDarkMode ? "text-white" : "text-gray-900"
-                            } line-clamp-1`}
+
+                {/* Content Section */}
+                <div className="p-5 flex flex-col flex-grow">
+                    {/* Title */}
+                    <h3
+                        className={`text-xl font-bold mb-3 ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                        } line-clamp-1 group-hover:text-blue-600 transition-colors`}
+                    >
+                        {destination.title}
+                    </h3>
+
+                    {/* Location */}
+                    <div className="flex items-center gap-2 mb-3">
+                        <div
+                            className={`p-1.5 rounded-lg ${
+                                isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                            }`}
                         >
-                            {destination.title}
-                        </h3>
-                        <p
-                            className={`text-sm ${
+                            <MapPin size={14} className="text-blue-600" />
+                        </div>
+                        <span
+                            className={`text-sm font-medium ${
                                 isDarkMode ? "text-gray-300" : "text-gray-600"
                             } line-clamp-1`}
                         >
-                            {destination.company_name || "Triplus"}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                            <MapPin
-                                size={14}
-                                className="text-blue-600 flex-shrink-0"
-                            />
-                            <span
-                                className={`text-sm ${
-                                    isDarkMode
-                                        ? "text-gray-300"
-                                        : "text-gray-600"
-                                } line-clamp-1`}
-                            >
-                                {destination.location}
-                            </span>
-                        </div>
+                            {destination.location}
+                        </span>
                     </div>
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center">
-                            <Calendar
-                                size={14}
-                                className={
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                }
-                            />
-                            <span
-                                className={`text-xs ${
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                } ml-1`}
-                            >
-                                {destination.duration || "3-7 days"}
-                            </span>
-                        </div>
-                        <div className="flex items-center">
-                            <Users
-                                size={14}
-                                className={
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                }
-                            />
-                            <span
-                                className={`text-xs ${
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                } ml-1`}
-                            >
-                                {destination.group_size || "2-8 people"}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="mt-auto">
+
+                    {/* Duration & Group Size */}
+                    <div className="flex items-center gap-3 mb-4">
                         <div
-                            className={`flex items-center justify-between pt-3 border-t ${
-                                isDarkMode
-                                    ? "border-gray-700"
-                                    : "border-gray-200"
+                            className={`flex items-center gap-1.5 text-xs ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
                             }`}
                         >
-                            <div>
-                                <span
-                                    className={`block text-xs font-medium ${
+                            <Calendar size={13} />
+                            <span>{destination.duration || "3-7 days"}</span>
+                        </div>
+                        <div
+                            className={`w-1 h-1 rounded-full ${
+                                isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                            }`}
+                        ></div>
+                        <div
+                            className={`flex items-center gap-1.5 text-xs ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                        >
+                            <Users size={13} />
+                            <span>{destination.group_size || "2-8 ppl"}</span>
+                        </div>
+                    </div>
+
+                    {/* Price & CTA Section - Redesigned for Perfect Alignment */}
+                    <div
+                        className={`mt-auto pt-4 border-t ${
+                            isDarkMode ? "border-gray-700" : "border-gray-200"
+                        }`}
+                    >
+                        <div className="flex items-center justify-between gap-3">
+                            {/* Price Column */}
+                            <div className="flex-1">
+                                <div
+                                    className={`text-xs font-semibold uppercase tracking-wider mb-1 ${
                                         isDarkMode
                                             ? "text-gray-400"
                                             : "text-gray-500"
                                     }`}
                                 >
-                                    {translations.starting_from ||
-                                        "Starting from"}
-                                </span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-blue-600 font-bold text-base">
+                                    {translations.starting_from || "From"}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-2xl font-black text-blue-600">
                                         $
                                         {destination.discount_price ||
                                             destination.price}
                                     </span>
                                     {destination.discount_price && (
-                                        <span
-                                            className={`text-xs ${
-                                                isDarkMode
-                                                    ? "text-gray-500"
-                                                    : "text-gray-400"
-                                            } line-through`}
-                                        >
-                                            ${destination.price}
-                                        </span>
+                                        <div className="flex flex-col">
+                                            <span
+                                                className={`text-xs line-through ${
+                                                    isDarkMode
+                                                        ? "text-gray-500"
+                                                        : "text-gray-400"
+                                                }`}
+                                            >
+                                                ${destination.price}
+                                            </span>
+                                        </div>
                                     )}
-                                    <span
-                                        className={`text-xs ${
-                                            isDarkMode
-                                                ? "text-gray-400"
-                                                : "text-gray-500"
-                                        }`}
-                                    >
-                                        {translations.per_night || "/ night"}
-                                    </span>
+                                </div>
+                                <div
+                                    className={`text-xs ${
+                                        isDarkMode
+                                            ? "text-gray-400"
+                                            : "text-gray-500"
+                                    }`}
+                                >
+                                    {translations.per_night || "per night"}
                                 </div>
                             </div>
+
+                            {/* CTA Button */}
                             <Link
                                 href={`/destinations/${destination.id}`}
-                                className="flex items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 text-sm font-medium shadow-md hover:shadow-lg"
-                                aria-label={`View ${destination.title} details`}
+                                className="shrink-0 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 text-sm font-bold shadow-sm hover:shadow-md group/btn"
+                                aria-label={`View ${destination.title}`}
                             >
-                                {translations.details || "Details"}
-                                <ArrowRight size={16} />
+                                View
+                                <ArrowRight
+                                    size={16}
+                                    className="group-hover/btn:translate-x-0.5 transition-transform"
+                                />
                             </Link>
                         </div>
                     </div>
@@ -475,18 +476,18 @@ const Pagination = ({ currentPage, totalPages, onPageChange, isDarkMode }) => {
     const endPage = Math.min(totalPages, currentPage + pageRange);
 
     return (
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <div className="flex items-center justify-center gap-2 mt-10">
             <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`p-2 rounded-full ${
+                className={`p-2.5 rounded-xl ${
                     isDarkMode
-                        ? "bg-gray-700 text-white hover:bg-blue-600"
-                        : "bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white"
-                } disabled:opacity-50 transition-all duration-300 shadow-md`}
+                        ? "bg-gray-800 text-white hover:bg-gray-700"
+                        : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                } disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm`}
                 aria-label="Previous page"
             >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={18} />
             </button>
             {pages
                 .filter((page) => page >= startPage && page <= endPage)
@@ -494,14 +495,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange, isDarkMode }) => {
                     <button
                         key={page}
                         onClick={() => onPageChange(page)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium ${
+                        className={`min-w-[40px] px-4 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-sm ${
                             currentPage === page
-                                ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                                ? "bg-blue-600 text-white"
                                 : isDarkMode
-                                ? "bg-gray-700 text-white hover:bg-blue-600"
-                                : "bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white"
-                        } transition-all duration-300 shadow-md`}
-                        aria-label={`Go to page ${page}`}
+                                ? "bg-gray-800 text-white hover:bg-gray-700"
+                                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                        }`}
+                        aria-label={`Page ${page}`}
                     >
                         {page}
                     </button>
@@ -509,14 +510,14 @@ const Pagination = ({ currentPage, totalPages, onPageChange, isDarkMode }) => {
             <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`p-2 rounded-full ${
+                className={`p-2.5 rounded-xl ${
                     isDarkMode
-                        ? "bg-gray-700 text-white hover:bg-blue-600"
-                        : "bg-gray-200 text-gray-700 hover:bg-blue-600 hover:text-white"
-                } disabled:opacity-50 transition-all duration-300 shadow-md`}
+                        ? "bg-gray-800 text-white hover:bg-gray-700"
+                        : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                } disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm`}
                 aria-label="Next page"
             >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} />
             </button>
         </div>
     );
@@ -536,7 +537,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
     const successMessage = flash?.success || null;
     const searchRef = useRef(null);
 
-    // Initialize dark mode from localStorage or system preference
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedMode = localStorage.getItem("darkMode");
         if (savedMode !== null) {
@@ -562,7 +562,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                 favorite_id: fav.id,
             };
         });
-        // Merge with offers and destinations
         offers.forEach((offer) => {
             if (!initial[`offer_${offer.id}`]) {
                 initial[`offer_${offer.id}`] = {
@@ -584,13 +583,11 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
     const [loadingFavorite, setLoadingFavorite] = useState({});
     const itemsPerPage = 4;
 
-    // Persist dark mode to localStorage
     useEffect(() => {
         localStorage.setItem("darkMode", isDarkMode);
         document.documentElement.classList.toggle("dark", isDarkMode);
     }, [isDarkMode]);
 
-    // Show flash messages as toasts
     useEffect(() => {
         if (flash.success) {
             toast.success(flash.success);
@@ -600,7 +597,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         }
     }, [flash]);
 
-    // Feature toggles
     const toggleChat = useCallback(() => setIsChatOpen((prev) => !prev), []);
     const handleCloseTooltip = useCallback(
         () => setIsTooltipVisible(false),
@@ -611,18 +607,15 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         []
     );
 
-    // Scroll to search section
     const scrollToSearch = useCallback(() => {
         searchRef.current?.scrollIntoView({ behavior: "smooth" });
     }, []);
 
-    // Auto hide tooltip after delay
     useEffect(() => {
         const timer = setTimeout(() => setIsTooltipVisible(false), 4000);
         return () => clearTimeout(timer);
     }, []);
 
-    // Auto advance slider for hero sections
     useEffect(() => {
         if (heroSections.length > 1) {
             const timer = setInterval(() => {
@@ -632,7 +625,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         }
     }, [heroSections]);
 
-    // Toggle favorite with optimistic update
     const toggleFavorite = useCallback(
         async (itemId, itemType) => {
             if (!user) {
@@ -646,7 +638,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                 favorite_id: null,
             };
 
-            // Optimistic update
             setFavorites((prev) => ({
                 ...prev,
                 [key]: {
@@ -690,7 +681,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         [user, favorites]
     );
 
-    // Debounce search query
     useEffect(() => {
         const handler = setTimeout(() => {
             const lowerQuery = searchQuery.toLowerCase();
@@ -742,7 +732,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         return () => clearTimeout(handler);
     }, [searchQuery, selectedCategory, destinations, offers, packages]);
 
-    // Calculate discount percentage
     const calculateDiscount = useCallback((original, discounted) => {
         if (
             !discounted ||
@@ -754,7 +743,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         return Math.round(((original - discounted) / original) * 100);
     }, []);
 
-    // Handle "Surprise Me" button
     const handleSurpriseMe = useCallback(() => {
         const allItems = [
             ...destinations.map((d) => ({
@@ -783,13 +771,11 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
         setSuggestions(shuffled.slice(0, 3));
     }, [destinations, offers, packages]);
 
-    // Clear search input
     const clearSearch = useCallback(() => {
         setSearchQuery("");
         setSuggestions([]);
     }, []);
 
-    // Pagination for offers and destinations
     const paginatedOffers = useMemo(() => {
         const start = (offerPage - 1) * itemsPerPage;
         return offers.slice(start, start + itemsPerPage);
@@ -803,7 +789,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
     const totalOfferPages = Math.ceil(offers.length / itemsPerPage);
     const totalDestinationPages = Math.ceil(destinations.length / itemsPerPage);
 
-    // Categories with icons
     const categories = [
         { name: "All", icon: Compass },
         { name: "Beach", icon: Umbrella },
@@ -819,8 +804,8 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
             className={`min-h-screen ${
                 isDarkMode
                     ? "dark bg-gray-900 text-white"
-                    : "bg-gray-100 text-gray-900"
-            } transition-all duration-300`}
+                    : "bg-gray-50 text-gray-900"
+            }`}
             data-dark-mode={isDarkMode}
         >
             <Head>
@@ -828,16 +813,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                 <meta
                     name="description"
                     content="Discover unforgettable trips, explore stunning destinations, and book the best travel deals with Triplus."
-                />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link
-                    rel="preconnect"
-                    href="https://fonts.gstatic.com"
-                    crossOrigin="true"
-                />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-                    rel="stylesheet"
                 />
             </Head>
             <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
@@ -847,101 +822,92 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                 toggleDarkMode={toggleDarkMode}
             />
 
-            {/* Hero Carousel Section */}
+            {/* Hero Section */}
             <section className="relative h-screen w-full overflow-hidden">
                 {heroSections.length === 0 ? (
                     <div
                         className={`absolute inset-0 flex items-center justify-center ${
-                            isDarkMode
-                                ? "bg-gradient-to-r from-gray-900 to-gray-800"
-                                : "bg-gradient-to-r from-gray-200 to-gray-300"
-                        } text-center p-6`}
+                            isDarkMode ? "bg-gray-900" : "bg-gray-100"
+                        }`}
                     >
                         <p
                             className={`text-xl ${
                                 isDarkMode ? "text-gray-300" : "text-gray-600"
                             }`}
                         >
-                            No hero sections available. Please add some in the
-                            admin dashboard.
+                            No hero sections available.
                         </p>
                     </div>
                 ) : (
                     <>
-                        <div className="absolute inset-0 bg-gray-900">
-                            <AnimatePresence initial={false}>
+                        <div className="absolute inset-0">
+                            <AnimatePresence initial={false} mode="wait">
                                 <motion.div
                                     key={currentSlide}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    transition={{
-                                        duration: 0.8,
-                                        ease: [0.4, 0, 0.2, 1],
-                                    }}
+                                    transition={{ duration: 0.5 }}
                                     className="absolute inset-0"
                                 >
-                                    <div className="relative w-full h-full">
-                                        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
-                                        <img
-                                            src={
-                                                heroSections[currentSlide]
-                                                    ?.image ||
-                                                "/images/placeholder-hero.jpg"
-                                            }
-                                            alt={
-                                                heroSections[currentSlide]
-                                                    ?.title || "Hero Image"
-                                            }
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                            onError={(e) =>
-                                                (e.target.src =
-                                                    "/images/placeholder-hero.jpg")
-                                            }
-                                        />
-                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
+                                    <img
+                                        src={
+                                            heroSections[currentSlide]?.image ||
+                                            "/images/placeholder-hero.jpg"
+                                        }
+                                        alt={
+                                            heroSections[currentSlide]?.title ||
+                                            "Hero Image"
+                                        }
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                        onError={(e) =>
+                                            (e.target.src =
+                                                "/images/placeholder-hero.jpg")
+                                        }
+                                    />
                                 </motion.div>
                             </AnimatePresence>
                         </div>
 
-                        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 z-10 pt-44">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
                             <motion.div
-                                initial={{ opacity: 0, y: 30 }}
+                                key={`content-${currentSlide}`}
+                                initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3, duration: 0.8 }}
-                                className="max-w-5xl mx-auto text-center px-6"
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                                className="max-w-4xl"
                             >
-                                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-xl">
+                                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6">
                                     {heroSections[currentSlide]?.title ||
                                         "Welcome to Triplus"}
                                 </h1>
-                                <p className="text-xl md:text-2xl text-gray-100 mb-10 max-w-3xl mx-auto font-light drop-shadow-md">
+                                <p className="text-xl md:text-2xl text-white/90 mb-8">
                                     {heroSections[currentSlide]?.subtitle ||
                                         "Plan your next adventure with us."}
                                 </p>
-                                <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                     <Link
                                         href="/booking"
-                                        className="px-8 py-4 bg-white text-gray-900 rounded-full shadow-lg hover:bg-gray-100 transition-all duration-300 font-semibold text-lg min-w-48 text-center hover:scale-105 transform"
-                                        aria-label="Start planning your trip"
+                                        className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-lg shadow-lg"
+                                        aria-label="Start planning"
                                     >
                                         {heroSections[currentSlide]?.cta_text ||
                                             "Start Planning"}
                                     </Link>
                                     <button
                                         onClick={scrollToSearch}
-                                        className="flex items-center gap-2 px-8 py-4 border-2 border-white/80 rounded-full hover:bg-white/10 transition-all duration-300 font-medium text-white hover:scale-105 transform"
-                                        aria-label="Search for destinations"
+                                        className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl hover:bg-white/20 transition-colors font-semibold text-lg border border-white/30"
+                                        aria-label="Explore"
                                     >
-                                        <Search size={20} />
-                                        Find Your Destination
+                                        Explore Destinations
                                     </button>
                                 </div>
                             </motion.div>
                         </div>
 
-                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-10 z-20">
+                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-8">
                             <button
                                 onClick={() =>
                                     setCurrentSlide((prev) =>
@@ -950,8 +916,8 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                                             : prev - 1
                                     )
                                 }
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all duration-300 shadow-lg hover:scale-110 transform"
-                                aria-label="Previous slide"
+                                className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors"
+                                aria-label="Previous"
                             >
                                 <ArrowLeft size={24} />
                             </button>
@@ -963,426 +929,312 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                                             : prev + 1
                                     )
                                 }
-                                className="w-12 h-12 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-all duration-300 shadow-lg hover:scale-110 transform"
-                                aria-label="Next slide"
+                                className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors"
+                                aria-label="Next"
                             >
                                 <ArrowRight size={24} />
                             </button>
                         </div>
 
-                        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 z-20">
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
                             {heroSections.map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setCurrentSlide(index)}
-                                    className={`h-1 rounded-full transition-all duration-300 ${
+                                    className={`h-2 rounded-full transition-all ${
                                         currentSlide === index
                                             ? "w-8 bg-white"
-                                            : "w-3 bg-white/50"
+                                            : "w-2 bg-white/50"
                                     }`}
-                                    aria-label={`Go to slide ${index + 1}`}
-                                ></button>
+                                    aria-label={`Slide ${index + 1}`}
+                                />
                             ))}
                         </div>
                     </>
                 )}
             </section>
 
-            {/* Journey Planner Section */}
+            {/* Search Section */}
             <section
-                className={`relative py-16 ${
-                    isDarkMode ? "bg-gray-800" : "bg-white"
-                } -mt-0 z-20`}
+                className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
                 ref={searchRef}
             >
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className={`relative ${
-                            isDarkMode
-                                ? "bg-gray-900 border-gray-700"
-                                : "bg-white border-gray-200"
-                        } rounded-3xl p-8 shadow-2xl border`}
-                    >
+                    <div className="text-center mb-12">
                         <h2
-                            className={`text-3xl md:text-4xl font-bold text-center ${
-                                isDarkMode ? "text-white" : "text-gray-800"
-                            } mb-4`}
+                            className={`text-4xl md:text-5xl font-bold mb-4 ${
+                                isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
-                            {translations.journey_planner_title ||
-                                "Discover Your Next Adventure"}{" "}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                                Adventure
-                            </span>
+                            Find Your Perfect Adventure
                         </h2>
                         <p
                             className={`text-lg ${
-                                isDarkMode ? "text-gray-300" : "text-gray-600"
-                            } text-center mb-8 max-w-2xl mx-auto`}
+                                isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
                         >
-                            {translations.journey_planner_subtitle ||
-                                "Search for your favorite destinations or browse new offers and packages"}
+                            Search destinations, offers, and packages
                         </p>
+                    </div>
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className="relative flex items-center mb-8"
-                        >
-                            <div className="relative w-full max-w-3xl mx-auto">
-                                <Search
-                                    className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
-                                        isDarkMode
-                                            ? "text-blue-400"
-                                            : "text-blue-600"
-                                    }`}
-                                    size={24}
-                                />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) =>
-                                        setSearchQuery(e.target.value)
-                                    }
-                                    placeholder={
-                                        translations.search_placeholder ||
-                                        "Search for destinations, offers, or packages..."
-                                    }
-                                    className={`w-full pl-12 pr-12 py-4 ${
-                                        isDarkMode
-                                            ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-                                            : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-400"
-                                    } border rounded-full text-lg font-light focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all duration-300 shadow-md`}
-                                    aria-label="Search destinations, offers, or packages"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        onClick={clearSearch}
-                                        className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
-                                            isDarkMode
-                                                ? "text-gray-400 hover:text-gray-200"
-                                                : "text-gray-500 hover:text-gray-800"
-                                        } transition-all duration-300`}
-                                        aria-label="Clear search"
-                                    >
-                                        <X size={24} />
-                                    </button>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8"
-                        >
-                            <div className="flex flex-wrap justify-center gap-3">
-                                {categories.map((category) => {
-                                    const Icon = category.icon;
-                                    return (
-                                        <motion.button
-                                            key={category.name}
-                                            whileHover={{
-                                                scale: 1.1,
-                                                boxShadow:
-                                                    "0 0 10px rgba(59, 130, 246, 0.3)",
-                                            }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() =>
-                                                setSelectedCategory(
-                                                    category.name.toLowerCase()
-                                                )
-                                            }
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                                                selectedCategory ===
-                                                category.name.toLowerCase()
-                                                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md"
-                                                    : isDarkMode
-                                                    ? "bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600"
-                                                    : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
-                                            } border`}
-                                            aria-label={`Filter by ${category.name}`}
-                                        >
-                                            <Icon size={16} />
-                                            {category.name}
-                                        </motion.button>
-                                    );
-                                })}
-                            </div>
-                            <motion.button
-                                whileHover={{
-                                    scale: 1.1,
-                                    boxShadow:
-                                        "0 0 15px rgba(59, 130, 246, 0.5)",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={handleSurpriseMe}
-                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold hover:shadow-lg"
-                                aria-label="Get random travel suggestions"
-                            >
-                                <Sparkles size={20} />
-                                {translations.surprise_me || "Surprise Me"}
-                            </motion.button>
-                        </motion.div>
-
-                        <AnimatePresence>
-                            {suggestions.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.4 }}
-                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                                >
-                                    {suggestions.map((item) => (
-                                        <Link
-                                            key={`${item.type}-${item.id}`}
-                                            href={
-                                                item.type === "destination"
-                                                    ? `/destinations/${item.id}`
-                                                    : item.type === "offer"
-                                                    ? `/offers/${item.id}`
-                                                    : `/packages/${item.id}`
-                                            }
-                                            className={`relative ${
-                                                isDarkMode
-                                                    ? "bg-gray-800 border-gray-700"
-                                                    : "bg-white border-gray-200"
-                                            } rounded-xl p-4 hover:bg-opacity-90 transition-all duration-300 shadow-md border group hover:shadow-lg`}
-                                            aria-label={`View ${
-                                                item.name || item.title
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <img
-                                                    src={
-                                                        item.image ||
-                                                        "/images/placeholder-small.jpg"
-                                                    }
-                                                    alt={
-                                                        item.name || item.title
-                                                    }
-                                                    className="w-16 h-16 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                                                    loading="lazy"
-                                                    onError={(e) =>
-                                                        (e.target.src =
-                                                            "/images/placeholder-small.jpg")
-                                                    }
-                                                />
-                                                <div>
-                                                    <h3
-                                                        className={`text-lg font-semibold ${
-                                                            isDarkMode
-                                                                ? "text-white"
-                                                                : "text-gray-800"
-                                                        }`}
-                                                    >
-                                                        {item.name ||
-                                                            item.title}
-                                                    </h3>
-                                                    <p
-                                                        className={`text-sm ${
-                                                            isDarkMode
-                                                                ? "text-gray-300"
-                                                                : "text-gray-600"
-                                                        }`}
-                                                    >
-                                                        {item.location ||
-                                                            item.destination_name ||
-                                                            "Unknown"}
-                                                    </p>
-                                                    <p className="text-blue-600 text-sm font-medium">
-                                                        $
-                                                        {item.discount_price ||
-                                                            item.price}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {calculateDiscount(
-                                                item.price,
-                                                item.discount_price
-                                            ) && (
-                                                <div className="absolute top-2 right-2 bg-gradient-to-r from-red-600 to-pink-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-md">
-                                                    {calculateDiscount(
-                                                        item.price,
-                                                        item.discount_price
-                                                    )}
-                                                    % OFF
-                                                </div>
-                                            )}
-                                        </Link>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Featured Promotions */}
-            <section
-                className={`py-16 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
-            >
-                <div className="max-w-7xl mx-auto px-6 md:px-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <div className="flex items-center justify-between mb-10">
-                            <div>
-                                <h2
-                                    className={`text-3xl font-bold ${
-                                        isDarkMode
-                                            ? "text-white"
-                                            : "text-gray-900"
-                                    }`}
-                                >
-                                    {translations.offers_section_title ||
-                                        "Featured Offers"}
-                                </h2>
-                                <p
-                                    className={`mt-2 ${
-                                        isDarkMode
-                                            ? "text-gray-400"
-                                            : "text-gray-600"
-                                    }`}
-                                >
-                                    {translations.offers_section_subtitle ||
-                                        "Exclusive deals and promotions for your next trip"}
-                                </p>
-                            </div>
-                            <Link
-                                href="/offers"
-                                className="flex items-center gap-1 text-blue-600 hover:underline"
-                                aria-label="View all offers"
-                            >
-                                {translations.view_all || "View All"}{" "}
-                                <ArrowRight size={16} />
-                            </Link>
-                        </div>
-
-                        {paginatedOffers.length === 0 ? (
-                            <div
-                                className={`text-center ${
+                    <div className="relative mb-10">
+                        <div className="relative">
+                            <Search
+                                className={`absolute left-5 top-1/2 transform -translate-y-1/2 ${
                                     isDarkMode
                                         ? "text-gray-400"
                                         : "text-gray-500"
-                                } py-8`}
-                            >
-                                {translations.offers_empty_message ||
-                                    "No offers available at the moment."}
-                            </div>
-                        ) : (
+                                }`}
+                                size={22}
+                            />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Where would you like to go?"
+                                className={`w-full pl-14 pr-14 py-5 ${
+                                    isDarkMode
+                                        ? "bg-gray-800 border-gray-700 text-white placeholder-gray-500"
+                                        : "bg-white border-gray-300 text-gray-900 placeholder-gray-400"
+                                } border-2 rounded-2xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm`}
+                                aria-label="Search"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={clearSearch}
+                                    className={`absolute right-5 top-1/2 transform -translate-y-1/2 ${
+                                        isDarkMode
+                                            ? "text-gray-400 hover:text-white"
+                                            : "text-gray-500 hover:text-gray-900"
+                                    }`}
+                                    aria-label="Clear"
+                                >
+                                    <X size={20} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-3 mb-10">
+                        {categories.map((category) => {
+                            const Icon = category.icon;
+                            const isActive =
+                                selectedCategory ===
+                                category.name.toLowerCase();
+                            return (
+                                <button
+                                    key={category.name}
+                                    onClick={() =>
+                                        setSelectedCategory(
+                                            category.name.toLowerCase()
+                                        )
+                                    }
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                                        isActive
+                                            ? "bg-blue-600 text-white shadow-md"
+                                            : isDarkMode
+                                            ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                                            : "bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200"
+                                    }`}
+                                >
+                                    <Icon size={16} />
+                                    {category.name}
+                                </button>
+                            );
+                        })}
+                        <button
+                            onClick={handleSurpriseMe}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all shadow-md"
+                        >
+                            <Sparkles size={16} />
+                            Surprise Me
+                        </button>
+                    </div>
+
+                    <AnimatePresence>
+                        {suggestions.length > 0 && (
                             <motion.div
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: 0.3 }}
-                                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="grid grid-cols-1 md:grid-cols-3 gap-5"
                             >
-                                {paginatedOffers.map((offer) => (
-                                    <OfferCard
-                                        key={offer.id}
-                                        offer={offer}
-                                        translations={translations}
-                                        isDarkMode={isDarkMode}
-                                        calculateDiscount={calculateDiscount}
-                                        toggleFavorite={toggleFavorite}
-                                        favorites={favorites}
-                                        loadingFavorite={loadingFavorite}
-                                    />
+                                {suggestions.map((item) => (
+                                    <Link
+                                        key={`${item.type}-${item.id}`}
+                                        href={
+                                            item.type === "destination"
+                                                ? `/destinations/${item.id}`
+                                                : item.type === "offer"
+                                                ? `/offers/${item.id}`
+                                                : `/packages/${item.id}`
+                                        }
+                                        className={`flex items-center gap-4 p-4 rounded-xl ${
+                                            isDarkMode
+                                                ? "bg-gray-800 hover:bg-gray-750"
+                                                : "bg-white hover:bg-gray-50 border-2 border-gray-200"
+                                        } transition-all shadow-sm hover:shadow-md`}
+                                    >
+                                        <img
+                                            src={
+                                                item.image ||
+                                                "/images/placeholder-small.jpg"
+                                            }
+                                            alt={item.name || item.title}
+                                            className="w-20 h-20 rounded-xl object-cover"
+                                            loading="lazy"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <h3
+                                                className={`font-bold mb-1 line-clamp-1 ${
+                                                    isDarkMode
+                                                        ? "text-white"
+                                                        : "text-gray-900"
+                                                }`}
+                                            >
+                                                {item.name || item.title}
+                                            </h3>
+                                            <p className="text-sm text-gray-500 line-clamp-1 mb-2">
+                                                {item.location ||
+                                                    item.destination_name}
+                                            </p>
+                                            <p className="text-base font-bold text-blue-600">
+                                                $
+                                                {item.discount_price ||
+                                                    item.price}
+                                            </p>
+                                        </div>
+                                    </Link>
                                 ))}
                             </motion.div>
                         )}
-                        {totalOfferPages > 1 && (
-                            <Pagination
-                                currentPage={offerPage}
-                                totalPages={totalOfferPages}
-                                onPageChange={setOfferPage}
-                                isDarkMode={isDarkMode}
-                            />
-                        )}
-                    </motion.div>
+                    </AnimatePresence>
                 </div>
             </section>
 
-            {/* Trending Destinations Section */}
+            {/* Offers Section */}
             <section
-                className={`py-24 ${
-                    isDarkMode
-                        ? "bg-gray-800"
-                        : "bg-gradient-to-b from-gray-50 to-white"
-                }`}
+                className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                        className="mb-12 text-center md:text-left"
-                    >
-                        <div className="flex flex-col md:flex-row md:items-center justify-between">
-                            <div>
-                                <h2
-                                    className={`text-3xl md:text-4xl font-extrabold ${
-                                        isDarkMode
-                                            ? "text-white"
-                                            : "text-gray-900"
-                                    }`}
-                                >
-                                    {translations.destinations_section_title ||
-                                        "Trending Destinations"}
-                                </h2>
-                                <p
-                                    className={`mt-3 text-lg ${
-                                        isDarkMode
-                                            ? "text-gray-300"
-                                            : "text-gray-600"
-                                    }`}
-                                >
-                                    {translations.destinations_subtitle ||
-                                        "Discover our most popular vacation spots loved by travelers worldwide"}
-                                </p>
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {paginatedDestinations.length === 0 ? (
-                        <div
-                            className={`text-center ${
-                                isDarkMode
-                                    ? "text-gray-400 bg-gray-900"
-                                    : "text-gray-500 bg-gray-200"
-                            } py-16 bg-opacity-10 rounded-xl`}
-                        >
-                            <Compass
-                                size={48}
-                                className="mx-auto mb-4 opacity-50"
-                            />
-                            <p className="text-lg font-medium">
-                                {translations.destinations_empty_title ||
-                                    "No destinations available at the moment."}
+                    <div className="flex items-end justify-between mb-10">
+                        <div>
+                            <h2
+                                className={`text-3xl md:text-4xl font-bold mb-2 ${
+                                    isDarkMode ? "text-white" : "text-gray-900"
+                                }`}
+                            >
+                                Exclusive Offers
+                            </h2>
+                            <p
+                                className={`text-base ${
+                                    isDarkMode
+                                        ? "text-gray-400"
+                                        : "text-gray-600"
+                                }`}
+                            >
+                                Limited-time deals with incredible savings
                             </p>
-                            <p className="mt-2">
-                                {translations.destinations_empty_subtitle ||
-                                    "Please check back later for new exciting locations."}
+                        </div>
+                        <Link
+                            href="/offers"
+                            className="hidden sm:flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold shadow-sm"
+                        >
+                            View All
+                            <ArrowRight size={18} />
+                        </Link>
+                    </div>
+
+                    {paginatedOffers.length === 0 ? (
+                        <div
+                            className={`text-center py-16 ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                        >
+                            <Tag
+                                size={56}
+                                className="mx-auto mb-4 opacity-40"
+                            />
+                            <p className="text-lg">
+                                No offers available at the moment.
                             </p>
                         </div>
                     ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {paginatedOffers.map((offer) => (
+                                <OfferCard
+                                    key={offer.id}
+                                    offer={offer}
+                                    translations={translations}
+                                    isDarkMode={isDarkMode}
+                                    calculateDiscount={calculateDiscount}
+                                    toggleFavorite={toggleFavorite}
+                                    favorites={favorites}
+                                    loadingFavorite={loadingFavorite}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {totalOfferPages > 1 && (
+                        <Pagination
+                            currentPage={offerPage}
+                            totalPages={totalOfferPages}
+                            onPageChange={setOfferPage}
+                            isDarkMode={isDarkMode}
+                        />
+                    )}
+
+                    <div className="text-center mt-8 sm:hidden">
+                        <Link
+                            href="/offers"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
                         >
+                            View All Offers
+                            <ArrowRight size={18} />
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Destinations Section */}
+            <section
+                className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
+            >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <h2
+                            className={`text-3xl md:text-4xl font-bold mb-4 ${
+                                isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
+                        >
+                            Trending Destinations
+                        </h2>
+                        <p
+                            className={`text-lg ${
+                                isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                        >
+                            Explore the world's most breathtaking places
+                        </p>
+                    </div>
+
+                    {paginatedDestinations.length === 0 ? (
+                        <div
+                            className={`text-center py-16 ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                        >
+                            <Compass
+                                size={56}
+                                className="mx-auto mb-4 opacity-40"
+                            />
+                            <p className="text-lg">
+                                No destinations available.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {paginatedDestinations.map((destination) => (
                                 <DestinationCard
                                     key={destination.id}
@@ -1395,8 +1247,9 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                                     loadingFavorite={loadingFavorite}
                                 />
                             ))}
-                        </motion.div>
+                        </div>
                     )}
+
                     {totalDestinationPages > 1 && (
                         <Pagination
                             currentPage={destinationPage}
@@ -1405,161 +1258,130 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                             isDarkMode={isDarkMode}
                         />
                     )}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.5 }}
-                        className="text-center mt-12"
-                    >
+
+                    <div className="text-center mt-12">
                         <Link
                             href="/destinations"
-                            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-medium bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
-                            aria-label="Explore all destinations"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-bold text-lg shadow-md"
                         >
-                            {translations.explore_all_destinations ||
-                                "Explore All Destinations"}{" "}
-                            <ArrowRight size={18} />
+                            Explore All Destinations
+                            <ArrowRight size={20} />
                         </Link>
-                        <p
-                            className={`mt-4 text-sm ${
-                                isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
-                        >
-                            {translations.over_200_destinations ||
-                                "Over 200+ exotic locations to discover around the world"}
-                        </p>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
             {/* Benefits Section */}
             <section
-                className={`py-20 ${
-                    isDarkMode
-                        ? "bg-gray-900"
-                        : "bg-gradient-to-b from-white to-gray-50"
-                }`}
+                className={`py-20 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}
             >
-                <div className="max-w-7xl mx-auto px-6 md:px-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-12">
                         <h2
-                            className={`text-3xl font-bold mb-12 text-center ${
+                            className={`text-3xl md:text-4xl font-bold mb-4 ${
                                 isDarkMode ? "text-white" : "text-gray-900"
                             }`}
                         >
-                            {translations.benefits_section_title ||
-                                "Why Choose Triplus"}
+                            Why Choose Triplus
                         </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {(
-                                translations.benefits || [
-                                    {
-                                        title: "Best Price Guarantee",
-                                        description:
-                                            "We guarantee the best prices compared to anywhere else.",
-                                    },
-                                    {
-                                        title: "Secure Booking",
-                                        description:
-                                            "Your personal information and payments are always protected.",
-                                    },
-                                    {
-                                        title: "High-Quality Service",
-                                        description:
-                                            "Our support team is available 24/7 to assist you.",
-                                    },
-                                    {
-                                        title: "Loyalty Rewards",
-                                        description:
-                                            "Earn points with every booking and enjoy exclusive benefits.",
-                                    },
-                                ]
-                            ).map((benefit, index) => (
-                                <motion.div
-                                    key={index}
-                                    whileHover={{ y: -5 }}
-                                    className={`p-6 rounded-xl ${
+                        <p
+                            className={`text-lg ${
+                                isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                        >
+                            Travel with confidence and peace of mind
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                            {
+                                icon: Tag,
+                                title: "Best Price Guarantee",
+                                description:
+                                    "We guarantee the best prices with our price match protection.",
+                            },
+                            {
+                                icon: Shield,
+                                title: "Secure Booking",
+                                description:
+                                    "Your payments are protected with bank-level encryption.",
+                            },
+                            {
+                                icon: Award,
+                                title: "Premium Service",
+                                description:
+                                    "24/7 support team ready to assist you anytime.",
+                            },
+                            {
+                                icon: Star,
+                                title: "Loyalty Rewards",
+                                description:
+                                    "Earn points with every booking and unlock exclusive benefits.",
+                            },
+                        ].map((benefit, index) => (
+                            <div
+                                key={index}
+                                className={`p-6 rounded-2xl ${
+                                    isDarkMode
+                                        ? "bg-gray-800"
+                                        : "bg-white border-2 border-gray-200"
+                                } shadow-sm hover:shadow-md transition-shadow`}
+                            >
+                                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                                    <benefit.icon
+                                        size={28}
+                                        className="text-blue-600"
+                                    />
+                                </div>
+                                <h3
+                                    className={`text-lg font-bold mb-2 ${
                                         isDarkMode
-                                            ? "bg-gray-800 hover:bg-gray-700"
-                                            : "bg-white hover:bg-gray-50"
-                                    } shadow-md hover:shadow-lg transition-all duration-300`}
+                                            ? "text-white"
+                                            : "text-gray-900"
+                                    }`}
                                 >
-                                    <div
-                                        className={`inline-flex items-center justify-center p-4 rounded-full mb-6 ${
-                                            isDarkMode
-                                                ? "bg-blue-900 text-blue-400"
-                                                : "bg-blue-100 text-blue-600"
-                                        }`}
-                                    >
-                                        {index === 0 && <Tag size={24} />}
-                                        {index === 1 && <Shield size={24} />}
-                                        {index === 2 && <Award size={24} />}
-                                        {index === 3 && <Users size={24} />}
-                                    </div>
-                                    <h3 className="text-xl font-semibold mb-3">
-                                        {benefit.title}
-                                    </h3>
-                                    <p
-                                        className={
-                                            isDarkMode
-                                                ? "text-gray-300"
-                                                : "text-gray-600"
-                                        }
-                                    >
-                                        {benefit.description}
-                                    </p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
+                                    {benefit.title}
+                                </h3>
+                                <p
+                                    className={`text-sm leading-relaxed ${
+                                        isDarkMode
+                                            ? "text-gray-400"
+                                            : "text-gray-600"
+                                    }`}
+                                >
+                                    {benefit.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
             <Footer isDarkMode={isDarkMode} />
 
-            {/* Chat Bot & Helpers */}
-            <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end">
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
                 {isTooltipVisible && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className={`mb-2 p-4 ${
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        className={`max-w-xs p-4 ${
                             isDarkMode
                                 ? "bg-gray-800 text-white"
-                                : "bg-white text-black"
-                        } rounded-lg shadow-lg text-sm transition-all duration-300 max-w-xs`}
+                                : "bg-white text-gray-900 border-2 border-gray-200"
+                        } rounded-xl shadow-lg`}
                     >
                         <button
                             onClick={handleCloseTooltip}
-                            className={`absolute top-1 right-1 ${
-                                isDarkMode
-                                    ? "text-gray-400 hover:text-white"
-                                    : "text-gray-500 hover:text-gray-800"
-                            }`}
-                            aria-label="Close tooltip"
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
                         >
-                            <CircleX size={20} />
+                            <X size={16} />
                         </button>
-                        <div className="flex items-center">
-                            <MessageCircle
-                                className={`mr-2 ${
-                                    isDarkMode
-                                        ? "text-blue-400"
-                                        : "text-blue-600"
-                                }`}
-                            />
-                            <p>
-                                Need help planning your trip? Our AI chat bot is
-                                here to assist you.
-                            </p>
-                        </div>
+                        <p className="text-sm font-semibold mb-1">Need Help?</p>
+                        <p className="text-xs opacity-80">
+                            Our AI assistant is here to help!
+                        </p>
                     </motion.div>
                 )}
                 <ChatBot
@@ -1568,23 +1390,6 @@ const HomePage = ({ auth, favorites: initialFavorites = [] }) => {
                     isDarkMode={isDarkMode}
                 />
             </div>
-
-            {/* Flash Message */}
-            {successMessage && (
-                <motion.div
-                    initial={{ opacity: 0, y: -50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg ${
-                        isDarkMode
-                            ? "bg-green-800 text-white"
-                            : "bg-green-600 text-white"
-                    } z-50`}
-                    role="alert"
-                >
-                    {successMessage}
-                </motion.div>
-            )}
         </div>
     );
 };

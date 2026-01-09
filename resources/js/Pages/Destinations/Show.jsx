@@ -2,56 +2,83 @@ import React, { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { MapPin, ChevronLeft, Star, Heart } from "lucide-react";
+import {
+    MapPin,
+    ArrowLeft,
+    Star,
+    Heart,
+    Check,
+    X,
+    Clock,
+    Users,
+    Calendar,
+    Shield,
+    Award,
+    Sparkles,
+    Building2,
+    BadgeCheck,
+    CircleDollarSign,
+    Share2,
+    Globe,
+    Camera,
+    Compass,
+} from "lucide-react";
 import Navbar from "../../Components/Nav";
 import Footer from "../../Components/Footer";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Show({ destination, auth }) {
-    const [isDarkMode, setIsDarkMode] = useState(true);
     const [favoriteState, setFavoriteState] = useState({
         is_favorite: destination.is_favorite || false,
         favorite_id: destination.favorite_id || null,
     });
+    const [loadingFavorite, setLoadingFavorite] = useState(false);
+    const user = auth?.user || null;
 
-    // Animation variants
-    const fadeIn = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    const canGoBack = window.history.length > 2;
+
+    const handleBack = () => {
+        window.history.back();
     };
 
     const calculateDiscount = (original, discounted) => {
-        if (!discounted) return null;
-        const percentage = Math.round(
-            ((original - discounted) / original) * 100
-        );
-        return percentage;
+        const orig = parseFloat(original);
+        const disc = parseFloat(discounted);
+        if (!orig || !disc || orig <= disc) return 0;
+        return Math.round(((orig - disc) / orig) * 100);
     };
 
-    const renderStars = (rating) => {
-        const stars = [];
-        const roundedRating = Math.round(rating * 2) / 2;
-        for (let i = 1; i <= 5; i++) {
-            stars.push(
-                <Star
-                    key={i}
-                    size={18}
-                    className={
-                        i <= roundedRating
-                            ? "text-yellow-400 fill-yellow-400"
-                            : "text-gray-500"
-                    }
-                />
-            );
-        }
-        return stars;
+    const renderStars = (rating = 0) => {
+        return Array.from({ length: 5 }, (_, i) => (
+            <Star
+                key={i}
+                size={18}
+                className={
+                    i < Math.round(rating)
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-600"
+                }
+            />
+        ));
+    };
+
+    const formatPrice = (price) => {
+        const parsed = parseFloat(price);
+        return isNaN(parsed) ? "0.00" : parsed.toFixed(2);
     };
 
     const toggleFavorite = async () => {
-        if (!auth?.user) {
-            toast.error("Please log in to add to favorites.");
+        if (!user) {
+            toast.error("Please log in to add to favorites");
             return;
         }
+
+        const prevState = { ...favoriteState };
+        setFavoriteState({
+            is_favorite: !favoriteState.is_favorite,
+            favorite_id: favoriteState.is_favorite ? null : "temp",
+        });
+        setLoadingFavorite(true);
 
         try {
             const response = await axios.post("/favorites", {
@@ -66,414 +93,615 @@ export default function Show({ destination, auth }) {
                 toast.success(message);
             } else {
                 toast.error(message);
+                setFavoriteState(prevState);
             }
         } catch (error) {
             const errorMessage =
                 error.response?.data?.message || "Failed to toggle favorite.";
             toast.error(errorMessage);
+            setFavoriteState(prevState);
+        } finally {
+            setLoadingFavorite(false);
         }
     };
 
-    // Calculate total price
+    const handleShare = () => {
+        if (navigator.share) {
+            navigator
+                .share({
+                    title: destination.title,
+                    text: destination.description,
+                    url: window.location.href,
+                })
+                .then(() => toast.success("Shared successfully!"))
+                .catch(() => {});
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            toast.success("Link copied to clipboard!");
+        }
+    };
+
     const serviceFee = 9.99;
     const bookingFee = 4.99;
     const basePrice = parseFloat(
         destination.discount_price || destination.price || 0
     );
     const totalPrice = basePrice + serviceFee + bookingFee;
+    const discount = calculateDiscount(
+        destination.price,
+        destination.discount_price
+    );
+
+    const imageSrc = destination.image || "/images/placeholder.jpg";
+
+    // Highlights
+    const highlights = [
+        {
+            icon: MapPin,
+            label: "Location",
+            value: destination.location || "TBA",
+        },
+        {
+            icon: BadgeCheck,
+            label: "Rating",
+            value: `${destination.rating || 0}/5`,
+        },
+        {
+            icon: Globe,
+            label: "Category",
+            value: destination.category || "N/A",
+        },
+        {
+            icon: Camera,
+            label: "Type",
+            value: destination.is_featured ? "Featured" : "Standard",
+        },
+    ];
+
+    const benefits = [
+        "Best price guarantee",
+        "Free cancellation up to 24h",
+        "Instant confirmation",
+        "24/7 customer support",
+        "Secure payment",
+        "Expert local guides",
+    ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white transition-all duration-300 relative">
-            <Head title={`${destination.title} - Triplus`} />
-            <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+        <div className="min-h-screen bg-gray-950 text-white">
+            <Head title={`${destination.title || "Destination"} - Triplus`} />
+            <Toaster position="top-right" />
+            <Navbar user={user} />
 
-            <Navbar
-                user={auth?.user}
-                isDarkMode={isDarkMode}
-                toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-            />
-
-            {/* Hero Section */}
-            <div className="relative h-64 md:h-72 overflow-hidden">
-                <div className="absolute inset-0 bg-gray-900 opacity-80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center opacity-30 bg-fill"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center px-4">
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7 }}
-                            className="text-4xl md:text-6xl font-extrabold mb-2 leading-tight"
-                        >
-                            {destination.title}
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.7 }}
-                            className="text-lg md:text-xl text-gray-300 mb-4 max-w-xl mx-auto"
-                        >
-                            <MapPin
-                                className="inline-block mr-1 mb-1"
-                                size={18}
-                            />
-                            {destination.location}
-                        </motion.p>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.3, duration: 0.7 }}
-                        >
-                            <div className="w-24 h-1 bg-blue-500 mx-auto rounded-full"></div>
-                        </motion.div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Content */}
-            <div className="max-w-7xl mx-auto px-6 md:px-16 py-12">
-                {/* Breadcrumb */}
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={fadeIn}
-                    className="mb-8"
+            {/* Back Button */}
+            {canGoBack && (
+                <button
+                    onClick={handleBack}
+                    className="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-gray-800/80 backdrop-blur-sm text-white rounded-full border border-gray-700 hover:bg-gray-700 hover:border-blue-500 transition-all shadow-lg"
                 >
-                    <div className="flex items-center text-sm text-gray-400">
-                        <Link
-                            href="/destinations"
-                            className="hover:text-blue-400 transition-colors duration-300 flex items-center"
-                        >
-                            <ChevronLeft size={16} className="mr-1" />
-                            Back to Destinations
-                        </Link>
-                    </div>
-                </motion.div>
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="font-medium">Back</span>
+                </button>
+            )}
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content - Left Side */}
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
-                        variants={fadeIn}
-                        className="lg:col-span-2"
-                    >
-                        <div className="bg-gray-800 bg-opacity-70 rounded-xl overflow-hidden shadow-xl backdrop-blur-sm border border-gray-700">
-                            {/* Main Image */}
-                            <div className="relative">
-                                <img
-                                    src={
-                                        destination.image ||
-                                        "https://via.placeholder.com/1200x800?text=No+Image"
-                                    }
-                                    alt={destination.title}
-                                    className="w-full h-96 object-cover"
-                                    loading="lazy"
-                                />
-                                {destination.category && (
-                                    <span className="absolute top-4 left-4 px-3 py-1 bg-blue-600 rounded-full text-sm font-medium text-white">
-                                        {destination.category}
-                                    </span>
-                                )}
-                                <div className="absolute top-4 right-1 flex flex-col gap-2">
-                                    {calculateDiscount(
-                                        destination.price,
-                                        destination.discount_price
-                                    ) && (
-                                        <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold text-center">
-                                            {calculateDiscount(
-                                                destination.price,
-                                                destination.discount_price
-                                            )}
-                                            % OFF
-                                        </div>
-                                    )}
-                                    <button
-                                        onClick={toggleFavorite}
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm ${
-                                            favoriteState.is_favorite
-                                                ? "bg-red-500 hover:bg-red-600"
-                                                : "bg-gray-900 bg-opacity-50 hover:bg-gray-700"
-                                        }`}
-                                        aria-label={
-                                            favoriteState.is_favorite
-                                                ? "Remove from favorites"
-                                                : "Add to favorites"
-                                        }
-                                    >
-                                        <Heart
-                                            size={18}
-                                            className={
-                                                favoriteState.is_favorite
-                                                    ? "text-white fill-white"
-                                                    : "text-gray-300"
-                                            }
-                                        />
-                                    </button>
-                                </div>
-                            </div>
+            {/* Hero Section with Image */}
+            <section className="relative h-[70vh] overflow-hidden">
+                {/* Image Background */}
+                <div className="absolute inset-0">
+                    <img
+                        src={imageSrc}
+                        alt={destination.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.target.src = "/images/placeholder.jpg";
+                        }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
+                </div>
 
-                            {/* Destination Details */}
-                            <div className="p-6 md:p-8">
-                                <div className="flex flex-wrap gap-2 items-center mb-4">
-                                    <div className="flex items-center">
-                                        {renderStars(destination.rating || 0)}
-                                        <span className="text-gray-400 text-sm ml-2">
-                                            ({destination.rating || 0}/5)
+                {/* Content Overlay */}
+                <div className="relative h-full flex items-end">
+                    <div className="max-w-7xl mx-auto px-6 pb-12 w-full">
+                        <div className="grid lg:grid-cols-3 gap-8 items-end">
+                            {/* Left: Title & Info */}
+                            <div className="lg:col-span-2">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="space-y-4"
+                                >
+                                    {/* Badges */}
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="px-4 py-1.5 bg-blue-500/20 border border-blue-500/30 backdrop-blur-sm text-blue-400 rounded-full text-sm font-semibold">
+                                            {destination.category ||
+                                                "Destination"}
                                         </span>
-                                    </div>
-                                    {destination.category && (
-                                        <span className="px-3 py-1 bg-blue-600 bg-opacity-20 text-blue-400 rounded-full text-xs">
-                                            {destination.category}
-                                        </span>
-                                    )}
-                                    {destination.is_featured && (
-                                        <span className="px-3 py-1 bg-purple-600 bg-opacity-20 text-purple-400 rounded-full text-xs">
-                                            Featured
-                                        </span>
-                                    )}
-                                    {destination.company && (
-                                        <span className="px-3 py-1 bg-gray-700 bg-opacity-20 text-gray-300 rounded-full text-xs">
-                                            by{" "}
-                                            {destination.company.company_name}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <h2 className="text-2xl font-bold text-white mb-4">
-                                    About this Destination
-                                </h2>
-
-                                <div className="prose prose-lg prose-invert">
-                                    <p className="text-gray-300 leading-relaxed whitespace-pre-line mb-6">
-                                        {destination.description}
-                                    </p>
-                                </div>
-
-                                <div className="mt-8">
-                                    <h3 className="text-xl font-semibold mb-4 text-blue-400">
-                                        Price Details
-                                    </h3>
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-                                        <div className="bg-gray-900 bg-opacity-50 rounded-lg p-4 flex-1">
-                                            <div className="text-gray-400 text-sm mb-1">
-                                                Starting from
-                                            </div>
-                                            <div className="flex items-baseline gap-2">
-                                                {destination.discount_price ? (
-                                                    <>
-                                                        <span className="text-2xl font-bold text-blue-400">
-                                                            $
-                                                            {
-                                                                destination.discount_price
-                                                            }
-                                                        </span>
-                                                        <span className="text-sm line-through text-gray-500">
-                                                            ${destination.price}
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <span className="text-2xl font-bold text-blue-400">
-                                                        ${destination.price}
-                                                    </span>
-                                                )}
-                                                <span className="text-sm text-gray-400">
-                                                    / person
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {calculateDiscount(
-                                            destination.price,
-                                            destination.discount_price
-                                        ) && (
-                                            <div className="bg-gray-900 bg-opacity-50 rounded-lg p-4 flex-1">
-                                                <div className="text-gray-400 text-sm mb-1">
-                                                    You save
-                                                </div>
-                                                <div className="flex items-baseline gap-2">
-                                                    <span className="text-2xl font-bold text-green-400">
-                                                        $
-                                                        {(
-                                                            destination.price -
-                                                            destination.discount_price
-                                                        ).toFixed(2)}
-                                                    </span>
-                                                    <span className="text-sm text-gray-400">
-                                                        (
-                                                        {calculateDiscount(
-                                                            destination.price,
-                                                            destination.discount_price
-                                                        )}
-                                                        % off)
-                                                    </span>
-                                                </div>
-                                            </div>
+                                        {destination.is_featured && (
+                                            <span className="px-4 py-1.5 bg-purple-500/20 border border-purple-500/30 backdrop-blur-sm text-purple-400 rounded-full text-sm font-semibold">
+                                                Featured
+                                            </span>
                                         )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Location Information Section */}
-                        <motion.div
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            variants={fadeIn}
-                            className="mt-8 bg-gray-800 bg-opacity-70 rounded-xl p-6 md:p-8 shadow-xl backdrop-blur-sm border border-gray-700"
-                        >
-                            <h3 className="text-xl font-semibold mb-4 text-blue-400">
-                                Location Information
-                            </h3>
-                            <p className="text-gray-300 mb-4">
-                                <MapPin
-                                    className="inline-block mr-2 mb-1"
-                                    size={18}
-                                />
-                                {destination.location}
-                            </p>
-                            <div className="bg-gray-900 bg-opacity-50 rounded-lg p-4 mt-4">
-                                <p className="text-gray-400">
-                                    This destination is located in{" "}
-                                    {destination.location}. The exact address
-                                    and directions will be provided after
-                                    booking.
-                                </p>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-
-                    {/* Sidebar - Right Side */}
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                        variants={fadeIn}
-                        className="space-y-6"
-                    >
-                        {/* Booking Card */}
-                        <div className="bg-gray-800 bg-opacity-70 rounded-xl p-6 shadow-xl backdrop-blur-sm border border-gray-700 sticky top-24 z-10">
-                            <h3 className="text-xl font-semibold mb-4">
-                                Book this Destination
-                            </h3>
-
-                            <div className="mb-6">
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className="text-gray-400">
-                                        Price per person
-                                    </span>
-                                    <div className="flex items-baseline gap-2">
-                                        {destination.discount_price ? (
-                                            <>
-                                                <span className="text-lg font-bold text-blue-400">
-                                                    $
-                                                    {destination.discount_price}
-                                                </span>
-                                                <span className="text-sm line-through text-gray-500">
-                                                    ${destination.price}
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <span className="text-lg font-bold text-blue-400">
-                                                ${destination.price}
+                                        {discount > 0 && (
+                                            <span className="px-4 py-1.5 bg-red-600 text-white rounded-full text-sm font-bold">
+                                                {discount}% OFF
                                             </span>
                                         )}
                                     </div>
-                                </div>
 
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-400">
-                                        Service fee
-                                    </span>
-                                    <span className="text-gray-300">
-                                        ${serviceFee}
-                                    </span>
-                                </div>
+                                    {/* Title */}
+                                    <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
+                                        {destination.title}
+                                    </h1>
 
-                                <div className="flex justify-between items-center mb-4">
-                                    <span className="text-gray-400">
-                                        Booking fee
-                                    </span>
-                                    <span className="text-gray-300">
-                                        ${bookingFee}
-                                    </span>
-                                </div>
-
-                                <div className="border-t border-gray-700 pt-3 flex justify-between items-center">
-                                    <span className="font-semibold">Total</span>
-                                    <span className="font-bold text-lg">
-                                        $
-                                        {typeof totalPrice === "number"
-                                            ? totalPrice.toFixed(2)
-                                            : "0.00"}
-                                    </span>
-                                </div>
+                                    {/* Rating & Location */}
+                                    <div className="flex flex-wrap items-center gap-6 text-gray-300">
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex">
+                                                {renderStars(
+                                                    destination.rating || 0
+                                                )}
+                                            </div>
+                                            <span className="font-semibold">
+                                                {destination.rating || 0}/5
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="w-5 h-5 text-blue-400" />
+                                            <span>{destination.location}</span>
+                                        </div>
+                                    </div>
+                                </motion.div>
                             </div>
 
-                            <div className="space-y-3">
-                                <Link
-                                    href={`/book?destination_id=${destination.id}`}
-                                    className="block w-full bg-blue-600 hover:bg-blue-500 text-white text-center py-3 rounded-lg transition-all duration-300 transform hover:scale-105"
-                                >
-                                    Book Now
-                                </Link>
+                            {/* Right: Price Card (Desktop only) */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="lg:block hidden"
+                            >
+                                <div className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+                                    <div className="text-center mb-4">
+                                        <p className="text-sm text-gray-400 mb-2">
+                                            Starting from
+                                        </p>
+                                        <div className="flex items-baseline justify-center gap-2">
+                                            <span className="text-4xl font-bold text-blue-400">
+                                                ${formatPrice(basePrice)}
+                                            </span>
+                                            {destination.discount_price && (
+                                                <span className="text-xl text-gray-500 line-through">
+                                                    $
+                                                    {formatPrice(
+                                                        destination.price
+                                                    )}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-sm text-gray-400 mt-1">
+                                            per person
+                                        </p>
+                                    </div>
 
-                                <button
-                                    onClick={toggleFavorite}
-                                    className={`block w-full py-3 rounded-lg text-center transition-all duration-300 ${
-                                        favoriteState.is_favorite
-                                            ? "bg-red-500 hover:bg-red-600 text-white"
-                                            : "bg-transparent border border-blue-500 text-blue-400 hover:bg-blue-900 hover:bg-opacity-20"
-                                    }`}
-                                >
-                                    {favoriteState.is_favorite
-                                        ? "Saved to Favorites"
-                                        : "Save to Favorites"}
-                                </button>
-                            </div>
-
-                            <div className="mt-4 text-center text-sm text-gray-400">
-                                No payment required to book
-                            </div>
+                                    <div className="space-y-3">
+                                        <Link
+                                            href={`/book?destination_id=${destination.id}`}
+                                            className="block w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-center py-3 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20"
+                                        >
+                                            Book Now
+                                        </Link>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={toggleFavorite}
+                                                disabled={loadingFavorite}
+                                                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                                                    favoriteState.is_favorite
+                                                        ? "bg-red-600 border-red-500 text-white"
+                                                        : "bg-transparent border-gray-700 text-gray-300 hover:border-blue-500"
+                                                }`}
+                                            >
+                                                <Heart
+                                                    className={`w-5 h-5 ${
+                                                        favoriteState.is_favorite
+                                                            ? "fill-white"
+                                                            : ""
+                                                    }`}
+                                                />
+                                            </button>
+                                            <button
+                                                onClick={handleShare}
+                                                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-blue-500 transition-all"
+                                            >
+                                                <Share2 className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
                         </div>
-                    </motion.div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <section className="max-w-7xl mx-auto px-6 py-20">
+                <div className="grid lg:grid-cols-3 gap-12">
+                    {/* Left Column - Main Content */}
+                    <div className="lg:col-span-2 space-y-12">
+                        {/* Quick Info Cards */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {highlights.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-4 text-center"
+                                    >
+                                        <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                                            <item.icon className="w-6 h-6 text-blue-400" />
+                                        </div>
+                                        <p className="text-xs text-gray-400 mb-1">
+                                            {item.label}
+                                        </p>
+                                        <p className="text-sm font-semibold text-white">
+                                            {item.value}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {/* Description Section */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+                        >
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                                    <Sparkles className="w-5 h-5 text-blue-400" />
+                                </div>
+                                <h2 className="text-2xl font-bold">
+                                    About This Destination
+                                </h2>
+                            </div>
+                            <div className="prose prose-lg prose-invert max-w-none">
+                                <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                                    {destination.description ||
+                                        "No description available."}
+                                </p>
+                            </div>
+                        </motion.div>
+
+                        {/* What's Included */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+                        >
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                                    <BadgeCheck className="w-5 h-5 text-blue-400" />
+                                </div>
+                                <h2 className="text-2xl font-bold">
+                                    Why Visit Here
+                                </h2>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-3">
+                                {benefits.map((benefit, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-3 bg-gray-900/50 rounded-lg p-3"
+                                    >
+                                        <div className="flex-shrink-0 w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                            <Check className="w-4 h-4 text-blue-400" />
+                                        </div>
+                                        <span className="text-gray-300">
+                                            {benefit}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {/* Location Details */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8"
+                        >
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                                    <Compass className="w-5 h-5 text-blue-400" />
+                                </div>
+                                <h2 className="text-2xl font-bold">
+                                    Location Information
+                                </h2>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <MapPin className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+                                <div>
+                                    <p className="text-lg font-semibold text-blue-400 mb-2">
+                                        {destination.location}
+                                    </p>
+                                    <p className="text-gray-300">
+                                        This destination is located in{" "}
+                                        {destination.location}. The exact
+                                        address and directions will be provided
+                                        after booking.
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Company Info */}
+                        {destination.company && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                className="bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border border-blue-500/30 rounded-2xl p-8"
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                                        <Building2 className="w-8 h-8 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold mb-2">
+                                            Managed by
+                                        </h3>
+                                        <p className="text-blue-400 font-semibold text-lg mb-2">
+                                            {destination.company.company_name}
+                                        </p>
+                                        <p className="text-gray-300 text-sm">
+                                            This destination is managed by a
+                                            verified and trusted travel company
+                                            with excellent service standards.
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </div>
+
+                    {/* Right Column - Booking Card (Sticky) */}
+                    <div className="lg:col-span-1">
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="sticky top-24 space-y-6"
+                        >
+                            {/* Main Booking Card */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+                                <div className="text-center mb-6">
+                                    <p className="text-sm text-gray-400 mb-2">
+                                        Starting from
+                                    </p>
+                                    <div className="flex items-baseline justify-center gap-2">
+                                        <span className="text-4xl font-bold text-blue-400">
+                                            ${formatPrice(basePrice)}
+                                        </span>
+                                        {destination.discount_price && (
+                                            <span className="text-xl text-gray-500 line-through">
+                                                $
+                                                {formatPrice(destination.price)}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-gray-400 mt-1">
+                                        per person
+                                    </p>
+                                </div>
+
+                                {/* Price Breakdown */}
+                                <div className="space-y-3 mb-6 bg-gray-900/50 rounded-xl p-4">
+                                    <h4 className="text-sm font-semibold text-gray-400 mb-3">
+                                        PRICE BREAKDOWN
+                                    </h4>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Base price
+                                        </span>
+                                        <span className="text-white">
+                                            ${formatPrice(basePrice)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Service fee
+                                        </span>
+                                        <span className="text-white">
+                                            ${formatPrice(serviceFee)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">
+                                            Booking fee
+                                        </span>
+                                        <span className="text-white">
+                                            ${formatPrice(bookingFee)}
+                                        </span>
+                                    </div>
+                                    {discount > 0 && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-blue-400">
+                                                Discount ({discount}%)
+                                            </span>
+                                            <span className="text-blue-400">
+                                                -$
+                                                {formatPrice(
+                                                    parseFloat(
+                                                        destination.price
+                                                    ) - basePrice
+                                                )}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="border-t border-gray-700 pt-3 flex justify-between font-bold">
+                                        <span>Total</span>
+                                        <span className="text-blue-400 text-lg">
+                                            ${formatPrice(totalPrice)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="space-y-3">
+                                    <Link
+                                        href={`/book?destination_id=${destination.id}`}
+                                        className="block w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-center py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20"
+                                    >
+                                        Book Now
+                                    </Link>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={toggleFavorite}
+                                            disabled={loadingFavorite}
+                                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                                                favoriteState.is_favorite
+                                                    ? "bg-red-600 border-red-500 text-white"
+                                                    : "bg-transparent border-gray-700 text-gray-300 hover:border-blue-500"
+                                            }`}
+                                        >
+                                            <Heart
+                                                className={`w-5 h-5 ${
+                                                    favoriteState.is_favorite
+                                                        ? "fill-white"
+                                                        : ""
+                                                }`}
+                                            />
+                                            <span className="text-sm">
+                                                {favoriteState.is_favorite
+                                                    ? "Saved"
+                                                    : "Save"}
+                                            </span>
+                                        </button>
+                                        <button
+                                            onClick={handleShare}
+                                            className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-blue-500 transition-all"
+                                        >
+                                            <Share2 className="w-5 h-5" />
+                                            <span className="text-sm">
+                                                Share
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <p className="text-center text-xs text-gray-500 mt-4">
+                                    🔒 No payment required to book
+                                </p>
+                            </div>
+
+                            {/* Trust Badges */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+                                <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                    <Shield className="w-5 h-5 text-blue-400" />
+                                    Why Book With Us?
+                                </h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-start gap-3">
+                                        <Award className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Best Price Guarantee
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                Find it cheaper? We'll refund
+                                                the difference
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <CircleDollarSign className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Free Cancellation
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                Cancel up to 24h before for a
+                                                full refund
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-medium">
+                                                Secure Payment
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                Your payment information is safe
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
 
-                {/* Call to Action */}
+                {/* Bottom CTA */}
                 <motion.div
-                    initial="hidden"
-                    whileInView="visible"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                    variants={fadeIn}
-                    className="text-center bg-blue-900 bg-opacity-40 rounded-xl p-8 shadow-xl max-w-4xl mx-auto mt-16 border border-blue-800"
+                    className="mt-20 bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-3xl p-12 text-center"
                 >
-                    <h2 className="text-2xl font-bold mb-4">
-                        Ready to Experience{" "}
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                        Ready to Explore{" "}
                         <span className="text-blue-400">
                             {destination.title}
                         </span>
                         ?
                     </h2>
-                    <p className="text-gray-300 mb-6">
-                        Book your adventure now and create unforgettable
-                        memories at this amazing destination.
+                    <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
+                        Book now and embark on an incredible journey to this
+                        amazing destination.
                     </p>
-                    <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Link
+                            href={`/book?destination_id=${destination.id}`}
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
+                        >
+                            Book This Destination
+                            <Calendar className="w-5 h-5" />
+                        </Link>
+                        <Link
+                            href="/destinations"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-blue-500 rounded-xl font-semibold hover:bg-blue-500/10 transition-all"
+                        >
+                            Explore More Destinations
+                        </Link>
+                    </div>
+                </motion.div>
+            </section>
+
+            {/* Mobile Floating Book Button */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 p-4 z-40">
+                <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
+                    <div>
+                        <p className="text-xs text-gray-400">From</p>
+                        <p className="text-2xl font-bold text-blue-400">
+                            ${formatPrice(basePrice)}
+                        </p>
+                    </div>
+                    <Link
                         href={`/book?destination_id=${destination.id}`}
-                        className="inline-block bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg transition-all duration-300"
+                        className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-center py-3 rounded-xl font-semibold"
                     >
                         Book Now
-                    </motion.a>
-                </motion.div>
+                    </Link>
+                </div>
             </div>
+
             <Footer />
         </div>
     );

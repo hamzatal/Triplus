@@ -9,15 +9,12 @@ import {
     ChevronRight,
     Filter,
     Tags,
-    Calendar,
     Star,
     Heart,
     Clock,
     Zap,
-    Award,
-    Percent,
-    Tag,
     Flame,
+    TrendingUp,
 } from "lucide-react";
 import Navbar from "../../Components/Nav";
 import Footer from "../../Components/Footer";
@@ -30,7 +27,6 @@ export default function Index({ auth, offers = [], flash = {} }) {
     const [sortBy, setSortBy] = useState("newest");
     const [filterOpen, setFilterOpen] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);
-    const [isDarkMode, setIsDarkMode] = useState(true);
     const [favorites, setFavorites] = useState(
         offers.reduce(
             (acc, offer) => ({
@@ -45,7 +41,6 @@ export default function Index({ auth, offers = [], flash = {} }) {
     );
 
     const itemsPerPage = 8;
-
     const categories = [
         "Beach",
         "Mountain",
@@ -55,26 +50,17 @@ export default function Index({ auth, offers = [], flash = {} }) {
         "Historical",
         "Wildlife",
     ];
-
-    const fadeIn = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    };
-
-    const staggerContainer = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-            },
-        },
-    };
+    const sortOptions = [
+        { value: "newest", label: "Newest First" },
+        { value: "priceAsc", label: "Price: Low to High" },
+        { value: "priceDesc", label: "Price: High to Low" },
+        { value: "discount", label: "Biggest Discount" },
+        { value: "expiring", label: "Expiring Soon" },
+    ];
 
     const cardVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-        exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
     };
 
     const toggleCategory = (category) => {
@@ -91,15 +77,12 @@ export default function Index({ auth, offers = [], flash = {} }) {
             toast.error("Please log in to add to favorites");
             return;
         }
-
         try {
             const response = await axios.post("/favorites", {
                 offer_id: offerId,
             });
-
             const { success, message, is_favorite, favorite_id } =
                 response.data;
-
             if (success) {
                 setFavorites((prev) => ({
                     ...prev,
@@ -114,13 +97,12 @@ export default function Index({ auth, offers = [], flash = {} }) {
         }
     };
 
-    const sortOptions = [
-        { value: "newest", label: "Newest First" },
-        { value: "priceAsc", label: "Price: Low to High" },
-        { value: "priceDesc", label: "Price: High to Low" },
-        { value: "discount", label: "Biggest Discount" },
-        { value: "expiring", label: "Expiring Soon" },
-    ];
+    const calculateDiscount = (original, discounted) => {
+        const orig = parseFloat(original);
+        const disc = parseFloat(discounted);
+        if (!orig || !disc || orig <= disc) return 0;
+        return Math.round(((orig - disc) / orig) * 100);
+    };
 
     const getDaysLeft = (endDate) => {
         if (!endDate) return null;
@@ -152,25 +134,17 @@ export default function Index({ auth, offers = [], flash = {} }) {
         return expiryDate >= today;
     };
 
-    const calculateDiscount = (original, discounted) => {
-        if (!discounted || isNaN(original) || isNaN(discounted)) return 0;
-        const percentage = Math.round(
-            ((original - discounted) / original) * 100
-        );
-        return percentage;
-    };
-
-    const renderStars = (rating) => {
+    const renderStars = (rating = 0) => {
         const stars = [];
-        const roundedRating = Math.round((rating || 0) * 2) / 2;
+        const rounded = Math.round(rating * 2) / 2;
         for (let i = 1; i <= 5; i++) {
             stars.push(
                 <Star
                     key={i}
                     size={14}
                     className={
-                        i <= roundedRating
-                            ? "text-yellow-300 fill-yellow-300"
+                        i <= rounded
+                            ? "text-yellow-400 fill-yellow-400"
                             : "text-gray-500"
                     }
                 />
@@ -218,18 +192,18 @@ export default function Index({ auth, offers = [], flash = {} }) {
                         (a.discount_price || a.price)
                     );
                 case "discount":
-                    const discountA = a.discount_price
-                        ? (a.price - a.discount_price) / a.price
-                        : 0;
-                    const discountB = b.discount_price
-                        ? (b.price - b.discount_price) / b.price
-                        : 0;
-                    return discountB - discountA;
+                    return (
+                        (b.discount_price
+                            ? (b.price - b.discount_price) / b.price
+                            : 0) -
+                        (a.discount_price
+                            ? (a.price - a.discount_price) / a.price
+                            : 0)
+                    );
                 case "expiring":
                     const daysLeftA = getDaysLeft(a.end_date) || Infinity;
                     const daysLeftB = getDaysLeft(b.end_date) || Infinity;
                     return daysLeftA - daysLeftB;
-                case "newest":
                 default:
                     return new Date(b.created_at) - new Date(a.created_at);
             }
@@ -240,6 +214,8 @@ export default function Index({ auth, offers = [], flash = {} }) {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const baseUrl = "/storage/";
 
     useEffect(() => {
         setCurrentPage(1);
@@ -254,195 +230,187 @@ export default function Index({ auth, offers = [], flash = {} }) {
     }, [flash]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white transition-all duration-300 relative">
+        <div className="min-h-screen bg-gray-950 text-white">
             <Head>
-                <title>Exclusive Offers - Travel Deal</title>
+                <title>Exclusive Offers - Triplus</title>
                 <meta
                     name="description"
-                    content="Discover limited-time exclusive travel deals with exclusive offer."
+                    content="Discover limited-time exclusive travel deals with Triplus."
                 />
             </Head>
             <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+            <Navbar user={user} />
 
-            <Navbar
-                user={user}
-                isDarkMode={isDarkMode}
-                toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-            />
-
-            <div className="relative h-80 md:h-96 overflow-hidden">
-                <div className="absolute inset-0 bg-gray-900 bg-opacity-80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center bg-opacity-30 bg-contain"></div>
-
-                <div className="absolute inset-0">
+            {/* Hero Section - مميز للعروض */}
+            <section className="relative pt-28 pb-16 md:pt-36 md:pb-5 bg-gradient-to-b from-orange-950/70 via-gray-950 to-gray-950 overflow-hidden">
+                {/* Animated Background Elements */}
+                <div className="absolute inset-0 opacity-20">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 0.15, scale: 1 }}
-                        transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            repeatType: "reverse",
+                        animate={{
+                            scale: [1, 1.2, 1],
+                            rotate: [0, 180, 360],
                         }}
-                        className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2"
-                    >
-                        <Percent className="w-20 h-20 text-amber-200" />
-                    </motion.div>
+                        transition={{
+                            duration: 20,
+                            repeat: Infinity,
+                            ease: "linear",
+                        }}
+                        className="absolute top-20 right-20 w-64 h-64 bg-orange-600 rounded-full blur-3xl"
+                    />
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 0.15, scale: 1 }}
-                        transition={{
-                            duration: 1.3,
-                            repeat: Infinity,
-                            repeatType: "reverse",
-                            delay: 0.5,
+                        animate={{
+                            scale: [1.2, 1, 1.2],
+                            rotate: [360, 180, 0],
                         }}
-                        className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2"
-                    >
-                        <Tag className="w-20 h-20 text-blue-200" />
-                    </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 0.15, scale: 1 }}
                         transition={{
-                            duration: 1.2,
+                            duration: 15,
                             repeat: Infinity,
-                            repeatType: "reverse",
-                            delay: 0.3,
+                            ease: "linear",
                         }}
-                        className="absolute top-1/3 right-1/3"
-                    >
-                        <Flame className="w-16 h-16 text-red-600" />
-                    </motion.div>
+                        className="absolute bottom-20 left-20 w-80 h-80 bg-red-600 rounded-full blur-3xl"
+                    />
                 </div>
 
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center px-4">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                            className="inline-block mb-4 px-3 py-1 bg-amber-500 text-sm text-white font-bold rounded-full"
-                        >
-                            LIMITED TIME OFFERS
-                        </motion.div>
-                        <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.7 }}
-                            className="text-4xl md:text-6xl font-extrabold mb-3 leading-tight"
-                        >
-                            Exclusive{" "}
-                            <span className="text-amber-400">Deals</span>
-                        </motion.h1>
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.7 }}
-                            className="text-lg text-gray-300 mb-4 max-w-xl mx-auto"
-                        >
-                            Unbeatable offers with limited availability - book
-                            before they're gone!
-                        </motion.p>
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: "6rem" }}
-                            transition={{ delay: 0.4, duration: 0.5 }}
-                            className="h-1 bg-amber-400 mx-auto rounded-full"
-                        ></motion.div>
-                    </div>
-                </div>
-            </div>
+                <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
+                    {/* Badge */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                        className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-gradient-to-r from-orange-600 to-red-600 rounded-full"
+                    >
+                        <Zap className="w-4 h-4" />
+                        <span className="text-sm font-bold uppercase tracking-wider">
+                            Limited Time Offers
+                        </span>
+                    </motion.div>
 
-            <div className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+                    <motion.h1
+                        initial={{ opacity: 0, y: 35 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, ease: "easeOut" }}
+                        className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6"
+                    >
+                        Hot{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-400 to-orange-500">
+                            Travel Deals
+                        </span>
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25, duration: 0.7 }}
+                        className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-10"
+                    >
+                        Unbeatable discounts with limited availability - grab
+                        them before they're gone!
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.45, duration: 0.6 }}
+                        className="inline-block w-24 h-1 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 rounded-full"
+                    />
+                </div>
+            </section>
+
+            <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+                {/* Stats Bar */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5 bg-gray-800 bg-opacity-50 p-4 rounded-xl border border-gray-700"
+                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 bg-gray-800/50 backdrop-blur-sm rounded-xl p-5 border border-gray-700"
                 >
-                    <div className="flex flex-col items-center p-3 border-r border-gray-700">
-                        <Zap className="w-6 h-6 text-amber-300 mb-2" />
-                        <p className="text-lg font-bold text-white">
+                    <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center mb-2">
+                            <Flame className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">
                             {offers.filter((o) => isHotOffer(o)).length}
                         </p>
-                        <p className="text-sm text-gray-400">Hot Deals</p>
+                        <p className="text-xs text-gray-400">Hot Deals</p>
                     </div>
-                    <div className="flex flex-col items-center p-3 md:border-r border-gray-700">
-                        <Clock className="w-6 h-6 text-red-300 mb-2" />
-                        <p className="text-lg font-bold text-white">
+                    <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center mb-2">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">
                             {
                                 offers.filter((o) => isExpiringSoon(o.end_date))
                                     .length
                             }
                         </p>
-                        <p className="text-sm text-gray-400">Ending Soon</p>
+                        <p className="text-xs text-gray-400">Ending Soon</p>
                     </div>
-                    <div className="flex flex-col items-center p-3 border-r border-gray-700">
-                        <Award className="w-6 h-6 text-yellow-300 mb-2" />
-                        <p className="text-lg font-bold text-white">
+                    <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center mb-2">
+                            <TrendingUp className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">
                             {
                                 offers.filter(
                                     (o) =>
                                         calculateDiscount(
                                             o.price,
                                             o.discount_price
-                                        ) > 30
+                                        ) >= 30
                                 ).length
                             }
                         </p>
-                        <p className="text-sm text-gray-400">Big Discounts</p>
+                        <p className="text-xs text-gray-400">30%+ OFF</p>
                     </div>
-                    <div className="flex flex-col items-center p-3">
-                        <Tag className="w-6 h-6 text-blue-300 mb-2" />
-                        <p className="text-lg font-bold text-white">
+                    <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center mb-2">
+                            <Zap className="w-6 h-6" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">
                             {offers.length}
                         </p>
-                        <p className="text-sm text-gray-400">Total Offers</p>
+                        <p className="text-xs text-gray-400">Total Offers</p>
                     </div>
                 </motion.div>
 
+                {/* Filters & Search */}
                 <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={fadeIn}
-                    className="mb-12"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-10"
                 >
-                    <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-                        <div className="relative w-full md:w-96">
+                    <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between mb-6">
+                        <div className="relative flex-1 max-w-md">
                             <input
                                 type="text"
                                 placeholder="Search offers or locations..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 bg-opacity-70 text-gray-300 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all duration-300"
+                                onChange={(e) => {
+                                    setSearchQuery(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-800/70 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                             />
-                            <Search className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         </div>
 
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                            <div className="relative w-full md:w-48">
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-lg bg-gray-800 bg-opacity-70 text-gray-300 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none transition-all duration-300"
-                                >
-                                    {sortOptions.map((option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                        <div className="flex gap-3 flex-wrap">
+                            <select
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="px-4 py-3 rounded-xl bg-gray-800/70 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                            >
+                                {sortOptions.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
 
                             <button
                                 onClick={() => setFilterOpen(!filterOpen)}
-                                className="flex items-center gap-2 px-4 py-3 rounded-lg bg-gray-800 bg-opacity-70 text-gray-300 border border-gray-700 hover:bg-gray-700 transition-all duration-300"
+                                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gray-800/70 border border-gray-700 hover:bg-gray-700"
                             >
-                                <Filter className="w-4 h-4" />
+                                <Filter size={18} />
                                 <span className="hidden sm:inline">
                                     Filters
                                 </span>
@@ -456,52 +424,46 @@ export default function Index({ auth, offers = [], flash = {} }) {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="overflow-hidden"
+                                className="overflow-hidden mb-8"
                             >
-                                <div className="p-4 bg-gray-800 bg-opacity-70 rounded-lg mb-6 border border-gray-700">
-                                    <div className="mb-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <Tags className="w-4 h-4 text-amber-400" />
-                                            <h3 className="text-lg font-semibold">
-                                                Categories
-                                            </h3>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {categories.map((category) => (
-                                                <button
-                                                    key={category}
-                                                    onClick={() =>
-                                                        toggleCategory(category)
-                                                    }
-                                                    className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 ${
-                                                        selectedCategories.includes(
-                                                            category
-                                                        )
-                                                            ? "bg-amber-500 text-white"
-                                                            : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                                                    }`}
-                                                >
-                                                    {category}
-                                                </button>
-                                            ))}
-                                        </div>
+                                <div className="p-5 bg-gray-800/70 rounded-xl border border-gray-700">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Tags className="text-orange-400" />
+                                        <h3 className="font-semibold">
+                                            Categories
+                                        </h3>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {categories.map((cat) => (
+                                            <button
+                                                key={cat}
+                                                onClick={() =>
+                                                    toggleCategory(cat)
+                                                }
+                                                className={`px-4 py-1.5 rounded-full text-sm ${
+                                                    selectedCategories.includes(
+                                                        cat
+                                                    )
+                                                        ? "bg-gradient-to-r from-orange-600 to-red-600 text-white"
+                                                        : "bg-gray-700 hover:bg-gray-600"
+                                                }`}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    <div className="flex justify-between items-center mb-6">
-                        <p className="text-gray-400">
+                    <div className="flex justify-between items-center text-sm text-gray-400">
+                        <p>
                             Showing{" "}
-                            {filteredOffers.length > 0
-                                ? Math.min(
-                                      (currentPage - 1) * itemsPerPage + 1,
-                                      filteredOffers.length
-                                  )
+                            {paginatedOffers.length > 0
+                                ? (currentPage - 1) * itemsPerPage + 1
                                 : 0}
-                            -
+                            –
                             {Math.min(
                                 currentPage * itemsPerPage,
                                 filteredOffers.length
@@ -511,46 +473,50 @@ export default function Index({ auth, offers = [], flash = {} }) {
                         {selectedCategories.length > 0 && (
                             <button
                                 onClick={() => setSelectedCategories([])}
-                                className="text-amber-300 hover:text-amber-200 text-sm"
+                                className="text-orange-400 hover:text-orange-300"
                             >
-                                Clear Filters
+                                Clear filters
                             </button>
                         )}
                     </div>
                 </motion.div>
 
+                {/* Offers Grid */}
                 <motion.div
                     initial="hidden"
                     animate="visible"
-                    variants={staggerContainer}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16"
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: { staggerChildren: 0.1 },
+                        },
+                    }}
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                 >
                     <AnimatePresence mode="popLayout">
                         {paginatedOffers.length === 0 ? (
                             <motion.div
-                                variants={fadeIn}
                                 className="col-span-full text-center py-16"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
                             >
-                                <div className="max-w-md mx-auto">
-                                    <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                                    <h3 className="text-2xl font-bold mb-2">
-                                        No Offers Found
-                                    </h3>
-                                    <p className="text-gray-400 mb-6">
-                                        We couldn't find any offers matching
-                                        your search criteria. Try adjusting the
-                                        filters or search term.
-                                    </p>
-                                    <button
-                                        onClick={() => {
-                                            setSearchQuery("");
-                                            setSelectedCategories([]);
-                                        }}
-                                        className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all duration-300"
-                                    >
-                                        Clear All Filters
-                                    </button>
-                                </div>
+                                <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                                <h3 className="text-2xl font-semibold mb-2">
+                                    No offers found
+                                </h3>
+                                <p className="text-gray-400 mb-6">
+                                    Try changing your search or filters
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setSelectedCategories([]);
+                                    }}
+                                    className="px-6 py-2 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700"
+                                >
+                                    Clear all
+                                </button>
                             </motion.div>
                         ) : (
                             paginatedOffers.map((offer) => (
@@ -558,133 +524,117 @@ export default function Index({ auth, offers = [], flash = {} }) {
                                     key={offer.id}
                                     variants={cardVariants}
                                     layout
-                                    whileHover={{
-                                        y: -8,
-                                        transition: { duration: 0.3 },
-                                    }}
-                                    className="bg-gray-800 bg-opacity-90 rounded-xl overflow-hidden shadow-xl border border-gray-700 flex flex-col group backdrop-blur-sm"
+                                    whileHover={{ y: -6 }}
+                                    className="bg-gray-800/80 rounded-xl overflow-hidden border border-gray-700 flex flex-col group relative"
                                 >
-                                    <div className="relative overflow-hidden">
+                                    {/* Hot Deal Badge */}
+                                    {isHotOffer(offer) && (
+                                        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-red-600 to-orange-600 text-white text-xs font-bold py-1.5 text-center z-10 flex items-center justify-center gap-1">
+                                            <Flame className="w-3 h-3" />
+                                            HOT DEAL
+                                        </div>
+                                    )}
+
+                                    <div className="relative">
                                         <img
                                             src={
-                                                offer.image ||
-                                                "https://via.placeholder.com/640x480?text=Offer+Image"
+                                                offer.image
+                                                    ? `${baseUrl}${offer.image}`
+                                                    : "https://via.placeholder.com/640x480?text=Offer"
                                             }
                                             alt={offer.title}
-                                            className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
+                                            className={`w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500 ${
+                                                isHotOffer(offer) ? "mt-7" : ""
+                                            }`}
                                             loading="lazy"
-                                            onError={(e) => {
-                                                e.target.src =
-                                                    "https://via.placeholder.com/640x480?text=Offer+Image";
-                                            }}
+                                            onError={(e) =>
+                                                (e.target.src =
+                                                    "https://via.placeholder.com/640x480?text=Offer")
+                                            }
                                         />
                                         {offer.category && (
-                                            <span className="absolute top-3 left-3 px-2 py-1 bg-amber-500 rounded-full text-xs font-medium text-white">
+                                            <span className="absolute top-3 left-3 px-2 py-1 bg-gray-900/90 backdrop-blur-sm rounded text-xs font-medium">
                                                 {offer.category}
                                             </span>
                                         )}
-                                        <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+                                        <div className="absolute top-3 right-3 flex flex-col gap-2">
                                             {calculateDiscount(
                                                 offer.price,
                                                 offer.discount_price
                                             ) > 0 && (
-                                                <div className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                                <motion.div
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    className="bg-gradient-to-r from-red-600 to-red-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold shadow-lg"
+                                                >
                                                     {calculateDiscount(
                                                         offer.price,
                                                         offer.discount_price
                                                     )}
                                                     % OFF
-                                                </div>
+                                                </motion.div>
                                             )}
                                             <button
                                                 onClick={() =>
                                                     toggleFavorite(offer.id)
                                                 }
-                                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm z-20 ${
-                                                    favorites[offer.id]
-                                                        ?.is_favorite
-                                                        ? "bg-red-500 hover:bg-red-600"
-                                                        : "bg-gray-900 bg-opacity-50 hover:bg-gray-700"
-                                                }`}
-                                                aria-label={
-                                                    favorites[offer.id]
-                                                        ?.is_favorite
-                                                        ? "Remove from favorites"
-                                                        : "Add to favorites"
-                                                }
+                                                className="w-9 h-9 rounded-full bg-gray-900/70 backdrop-blur-sm flex items-center justify-center hover:bg-gray-700 transition"
                                             >
                                                 <Heart
                                                     size={18}
                                                     className={
                                                         favorites[offer.id]
                                                             ?.is_favorite
-                                                            ? "text-white fill-white"
+                                                            ? "text-red-500 fill-red-500"
                                                             : "text-gray-300"
                                                     }
                                                 />
                                             </button>
                                         </div>
-                                        {isHotOffer(offer) && (
-                                            <div className="absolute bottom-0 left-0 w-full bg-red-600 text-white py-2 text-center text-sm font-bold">
-                                                HOT DEAL
-                                            </div>
-                                        )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 group-hover:opacity-60 transition-opacity duration-300"></div>
                                     </div>
+
                                     <div className="p-5 flex flex-col flex-grow">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-white line-clamp-1">
-                                                {offer.title}
-                                            </h3>
-                                        </div>
+                                        <h3 className="font-bold text-lg mb-2 line-clamp-1">
+                                            {offer.title}
+                                        </h3>
                                         {offer.location && (
-                                            <div className="flex items-center gap-2 mb-2">
+                                            <div className="flex items-center gap-1.5 text-sm text-gray-400 mb-3">
                                                 <MapPin
                                                     size={16}
-                                                    className="text-amber-400"
+                                                    className="text-orange-400"
                                                 />
-                                                <span className="text-gray-300 text-sm">
-                                                    {offer.location}
-                                                </span>
+                                                {offer.location}
                                             </div>
                                         )}
                                         <div className="flex items-center gap-1 mb-3">
-                                            {renderStars(offer.rating || 0)}
-                                            <span className="text-gray-400 text-sm ml-2">
-                                                ({offer.rating || 0}/5)
+                                            {renderStars(offer.rating)}
+                                            <span className="text-gray-500 text-sm ml-2">
+                                                ({offer.rating || "–"})
                                             </span>
                                         </div>
-                                        <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                                        <p className="text-gray-300 text-sm line-clamp-2 mb-3 flex-grow">
                                             {offer.description ||
                                                 "No description available."}
                                         </p>
 
+                                        {/* Expiry Warning */}
                                         {offer.end_date && (
                                             <div
-                                                className={`flex items-center gap-2 mb-4 ${
+                                                className={`flex items-center gap-1.5 text-sm mb-4 px-3 py-2 rounded-lg ${
                                                     isExpiringSoon(
                                                         offer.end_date
                                                     )
-                                                        ? "text-red-500"
-                                                        : "text-gray-300"
+                                                        ? "bg-red-900/30 text-red-400 border border-red-800"
+                                                        : "bg-gray-700/30 text-gray-400"
                                                 }`}
                                             >
-                                                <Clock
-                                                    size={16}
-                                                    className={
-                                                        isExpiringSoon(
-                                                            offer.end_date
-                                                        )
-                                                            ? "text-red-500"
-                                                            : "text-amber-400"
-                                                    }
-                                                />
-                                                <span className="text-sm">
+                                                <Clock size={16} />
+                                                <span className="text-xs">
                                                     {isExpiringSoon(
                                                         offer.end_date
                                                     ) ? (
                                                         <span className="font-bold">
-                                                            Only{" "}
+                                                            ⚡ Only{" "}
                                                             {getDaysLeft(
                                                                 offer.end_date
                                                             )}{" "}
@@ -696,7 +646,7 @@ export default function Index({ auth, offers = [], flash = {} }) {
                                                             left!
                                                         </span>
                                                     ) : (
-                                                        `Valid until ${formatDate(
+                                                        `Until ${formatDate(
                                                             offer.end_date
                                                         )}`
                                                     )}
@@ -705,50 +655,39 @@ export default function Index({ auth, offers = [], flash = {} }) {
                                         )}
 
                                         <div className="mt-auto">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div>
-                                                    <span className="block text-gray-400 text-sm">
-                                                        Starting from
-                                                    </span>
-                                                    <div className="flex items-baseline gap-2">
-                                                        {offer.discount_price ? (
-                                                            <>
-                                                                <span className="text-lg font-bold text-amber-400">
-                                                                    $
-                                                                    {parseFloat(
-                                                                        offer.discount_price
-                                                                    ).toFixed(
-                                                                        2
-                                                                    )}
-                                                                </span>
-                                                                <span className="text-sm line-through text-red-500">
-                                                                    $
-                                                                    {parseFloat(
-                                                                        offer.price
-                                                                    ).toFixed(
-                                                                        2
-                                                                    )}
-                                                                </span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="text-lg font-bold text-amber-400">
-                                                                $
-                                                                {parseFloat(
-                                                                    offer.price
-                                                                ).toFixed(2)}
-                                                            </span>
-                                                        )}
-                                                        <span className="text-xs text-gray-400">
-                                                            / person
+                                            <div className="flex items-baseline gap-2 mb-4">
+                                                {offer.discount_price ? (
+                                                    <>
+                                                        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+                                                            $
+                                                            {parseFloat(
+                                                                offer.discount_price
+                                                            ).toFixed(2)}
                                                         </span>
-                                                    </div>
-                                                </div>
+                                                        <span className="text-sm line-through text-gray-500">
+                                                            $
+                                                            {parseFloat(
+                                                                offer.price
+                                                            ).toFixed(2)}
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+                                                        $
+                                                        {parseFloat(
+                                                            offer.price
+                                                        ).toFixed(2)}
+                                                    </span>
+                                                )}
+                                                <span className="text-xs text-gray-400">
+                                                    / person
+                                                </span>
                                             </div>
                                             <Link
                                                 href={`/offers/${offer.id}`}
-                                                className="w-full inline-block text-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 transition-all duration-300 transform group-hover:shadow-lg"
+                                                className="block text-center py-3 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 rounded-lg font-medium transition shadow-lg shadow-orange-900/20"
                                             >
-                                                View Details
+                                                Grab This Deal
                                             </Link>
                                         </div>
                                     </div>
@@ -758,88 +697,59 @@ export default function Index({ auth, offers = [], flash = {} }) {
                     </AnimatePresence>
                 </motion.div>
 
+                {/* Pagination */}
                 {filteredOffers.length > 0 && totalPages > 1 && (
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={fadeIn}
-                        className="flex justify-center items-center"
-                    >
-                        <div className="flex items-center space-x-2">
+                    <div className="flex justify-center items-center gap-2 mt-12">
+                        <button
+                            onClick={() =>
+                                setCurrentPage((p) => Math.max(p - 1, 1))
+                            }
+                            disabled={currentPage === 1}
+                            className={`p-2 rounded-lg ${
+                                currentPage === 1
+                                    ? "text-gray-600"
+                                    : "hover:bg-gray-700"
+                            }`}
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+
+                        {Array.from(
+                            { length: totalPages },
+                            (_, i) => i + 1
+                        ).map((page) => (
                             <button
-                                onClick={() =>
-                                    setCurrentPage(Math.max(currentPage - 1, 1))
-                                }
-                                disabled={currentPage === 1}
-                                className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                                    currentPage === 1
-                                        ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-                                        : "bg-gray-800 text-white hover:bg-amber-500 transition-all duration-300"
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-10 h-10 rounded-lg ${
+                                    currentPage === page
+                                        ? "bg-gradient-to-r from-orange-600 to-red-600 text-white"
+                                        : "hover:bg-gray-700"
                                 }`}
                             >
-                                <ChevronLeft size={20} />
+                                {page}
                             </button>
+                        ))}
 
-                            {Array.from({ length: totalPages }, (_, i) => {
-                                const pageNum = i + 1;
-                                const isCurrentPage = pageNum === currentPage;
-                                const shouldShow =
-                                    pageNum === 1 ||
-                                    pageNum === totalPages ||
-                                    Math.abs(pageNum - currentPage) <= 1;
-
-                                if (!shouldShow) {
-                                    if (
-                                        pageNum === 2 ||
-                                        pageNum === totalPages - 1
-                                    ) {
-                                        return (
-                                            <span
-                                                key={pageNum}
-                                                className="w-10 h-10 flex items-center justify-center text-gray-400"
-                                            >
-                                                ...
-                                            </span>
-                                        );
-                                    }
-                                    return null;
-                                }
-
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                        className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                            isCurrentPage
-                                                ? "bg-amber-500 text-white"
-                                                : "bg-gray-800 text-white hover:bg-gray-700 transition-all duration-300"
-                                        }`}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                );
-                            })}
-
-                            <button
-                                onClick={() =>
-                                    setCurrentPage(
-                                        Math.min(currentPage + 1, totalPages)
-                                    )
-                                }
-                                disabled={currentPage === totalPages}
-                                className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                                    currentPage === totalPages
-                                        ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-                                        : "bg-gray-800 text-white hover:bg-amber-500 transition-all duration-300"
-                                }`}
-                            >
-                                <ChevronRight size={20} />
-                            </button>
-                        </div>
-                    </motion.div>
+                        <button
+                            onClick={() =>
+                                setCurrentPage((p) =>
+                                    Math.min(p + 1, totalPages)
+                                )
+                            }
+                            disabled={currentPage === totalPages}
+                            className={`p-2 rounded-lg ${
+                                currentPage === totalPages
+                                    ? "text-gray-600"
+                                    : "hover:bg-gray-700"
+                            }`}
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
                 )}
             </div>
+
             <Footer />
         </div>
     );

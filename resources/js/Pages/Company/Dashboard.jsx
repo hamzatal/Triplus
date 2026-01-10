@@ -24,6 +24,7 @@ import {
     Heart,
     Check,
     ChevronRight,
+    Sparkles,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "../../Components/Nav";
@@ -48,7 +49,7 @@ const customScrollbarStyles = `
         transition: background 0.2s;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #2563eb;
+        background: #10b981;
     }
     ::-webkit-scrollbar-corner {
         background: #1f2937;
@@ -128,7 +129,7 @@ const renderStars = (rating) => {
                 size={14}
                 className={
                     i <= roundedRating
-                        ? "text-amber-400 fill-amber-400"
+                        ? "text-yellow-400 fill-yellow-400"
                         : "text-gray-500"
                 }
             />
@@ -183,7 +184,7 @@ const FormFields = ({
                         type="text"
                         value={data.title}
                         onChange={(e) => setData("title", e.target.value)}
-                        className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                        className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                             errors.title ? "border-red-500" : ""
                         }`}
                         placeholder="Enter title"
@@ -209,7 +210,7 @@ const FormFields = ({
                             onChange={(e) =>
                                 setData("subtitle", e.target.value)
                             }
-                            className="pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200"
+                            className="pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200"
                             placeholder="Enter subtitle"
                         />
                     </div>
@@ -233,7 +234,7 @@ const FormFields = ({
                             onChange={(e) =>
                                 setData("destination_id", e.target.value)
                             }
-                            className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                            className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                                 errors.destination_id ? "border-red-500" : ""
                             }`}
                         >
@@ -260,7 +261,7 @@ const FormFields = ({
                 <textarea
                     value={data.description}
                     onChange={(e) => setData("description", e.target.value)}
-                    className={`w-full py-3 px-4 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none resize-y min-h-[120px] transition-all duration-200 ${
+                    className={`w-full py-3 px-4 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-y min-h-[120px] transition-all duration-200 ${
                         errors.description ? "border-red-500" : ""
                     }`}
                     placeholder="Enter description"
@@ -286,7 +287,7 @@ const FormFields = ({
                         type="text"
                         value={data.location}
                         onChange={(e) => setData("location", e.target.value)}
-                        className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                        className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                             errors.location ? "border-red-500" : ""
                         }`}
                         placeholder="Enter location"
@@ -308,7 +309,7 @@ const FormFields = ({
                     <select
                         value={data.category}
                         onChange={(e) => setData("category", e.target.value)}
-                        className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                        className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                             errors.category ? "border-red-500" : ""
                         }`}
                     >
@@ -346,7 +347,7 @@ const FormFields = ({
                             type="number"
                             value={data.price}
                             onChange={(e) => setData("price", e.target.value)}
-                            className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                            className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                                 errors.price ? "border-red-500" : ""
                             }`}
                             placeholder="Enter price"
@@ -373,7 +374,7 @@ const FormFields = ({
                             onChange={(e) =>
                                 setData("discount_price", e.target.value)
                             }
-                            className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                            className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                                 errors.discount_price ? "border-red-500" : ""
                             }`}
                             placeholder="Enter discount price"
@@ -404,7 +405,7 @@ const FormFields = ({
                                     onChange={(e) =>
                                         setData("start_date", e.target.value)
                                     }
-                                    className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                                    className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                                         errors.start_date
                                             ? "border-red-500"
                                             : ""
@@ -430,7 +431,7 @@ const FormFields = ({
                                     onChange={(e) =>
                                         setData("end_date", e.target.value)
                                     }
-                                    className={`pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200 ${
+                                    className={`pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200 ${
                                         errors.end_date ? "border-red-500" : ""
                                     }`}
                                 />
@@ -454,7 +455,7 @@ const FormFields = ({
                                 onChange={(e) =>
                                     setData("discount_type", e.target.value)
                                 }
-                                className="pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200"
+                                className="pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200"
                             >
                                 <option value="percentage">Percentage</option>
                                 <option value="fixed">Fixed Amount</option>
@@ -466,8 +467,8 @@ const FormFields = ({
 
             {/* Additional fields for Package type only */}
             {isPackage && (
-                <div className="mt-4 p-4 bg-green-900/30 rounded-lg border border-green-800/50">
-                    <h4 className="text-green-300 font-medium mb-4 flex items-center">
+                <div className="mt-4 p-4 bg-emerald-900/30 rounded-xl border border-emerald-800/50">
+                    <h4 className="text-emerald-300 font-medium mb-4 flex items-center">
                         <Award className="w-5 h-5 mr-2" />
                         Package Details
                     </h4>
@@ -484,7 +485,7 @@ const FormFields = ({
                                     onChange={(e) =>
                                         setData("duration", e.target.value)
                                     }
-                                    className="pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200"
+                                    className="pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200"
                                     placeholder="Enter duration in days"
                                     min="1"
                                 />
@@ -505,7 +506,7 @@ const FormFields = ({
                                             e.target.value
                                         )
                                     }
-                                    className="pl-10 w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200"
+                                    className="pl-10 w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all duration-200"
                                     placeholder="Enter maximum participants"
                                     min="1"
                                 />
@@ -520,7 +521,7 @@ const FormFields = ({
                                 onChange={(e) =>
                                     setData("includes", e.target.value)
                                 }
-                                className="w-full py-3 px-4 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none resize-y min-h-[80px] transition-all duration-200"
+                                className="w-full py-3 px-4 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-y min-h-[80px] transition-all duration-200"
                                 placeholder="Enter what's included (e.g., meals, transportation, accommodation)"
                             />
                         </div>
@@ -536,7 +537,7 @@ const FormFields = ({
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="w-full py-3 rounded-lg border bg-gray-800 text-white border-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-600 file:text-white hover:file:bg-green-500 transition-all duration-200"
+                        className="w-full py-3 rounded-xl border bg-gray-800/70 text-white border-gray-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 transition-all duration-200"
                     />
                 </div>
                 {imagePreview && (
@@ -544,7 +545,7 @@ const FormFields = ({
                         <img
                             src={imagePreview}
                             alt="Preview"
-                            className="w-full h-48 object-cover rounded-lg shadow-md"
+                            className="w-full h-48 object-cover rounded-xl shadow-md"
                             loading="lazy"
                         />
                         <motion.button
@@ -574,10 +575,13 @@ const FormFields = ({
                             onChange={(e) =>
                                 setData("is_featured", e.target.checked)
                             }
-                            className="mr-2 rounded border-gray-600 text-green-500 focus:ring-green-500 transition-colors"
+                            className="mr-2 rounded border-gray-600 text-emerald-500 focus:ring-emerald-500 transition-colors"
                         />
                         <span className="flex items-center">
-                            <Star size={16} className="mr-1.5 text-amber-400" />
+                            <Star
+                                size={16}
+                                className="mr-1.5 text-yellow-400"
+                            />
                             Featured
                         </span>
                     </label>
@@ -587,7 +591,7 @@ const FormFields = ({
                         type="checkbox"
                         checked={data.is_active}
                         onChange={(e) => setData("is_active", e.target.checked)}
-                        className="mr-2 rounded border-gray-600 text-green-500 focus:ring-green-500 transition-colors"
+                        className="mr-2 rounded border-gray-600 text-emerald-500 focus:ring-emerald-500 transition-colors"
                     />
                     <span className="flex items-center">
                         <Check size={16} className="mr-1.5 text-emerald-400" />
@@ -623,12 +627,12 @@ const AddEditModal = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
-                className="bg-gray-800 rounded-xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-700"
+                className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-700"
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-white flex items-center">
                         {isEditing ? (
-                            <Edit2 className="w-6 h-6 mr-2 text-green-400" />
+                            <Edit2 className="w-6 h-6 mr-2 text-emerald-400" />
                         ) : (
                             <Plus className="w-6 h-6 mr-2 text-emerald-400" />
                         )}
@@ -661,7 +665,7 @@ const AddEditModal = ({
                             whileTap={{ scale: 0.95 }}
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md"
+                            className="px-6 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors duration-200 shadow-md"
                         >
                             Cancel
                         </motion.button>
@@ -670,7 +674,7 @@ const AddEditModal = ({
                             whileTap={{ scale: 0.95 }}
                             type="submit"
                             disabled={processing}
-                            className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-500 hover:to-green-600 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
+                            className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
                         >
                             {processing ? (
                                 <span className="animate-spin text-lg">⟳</span>
@@ -704,7 +708,7 @@ const DeleteConfirmationModal = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
-                className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700"
+                className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full shadow-2xl border border-gray-700"
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-white flex items-center">
@@ -722,7 +726,7 @@ const DeleteConfirmationModal = ({
                 </div>
                 <p className="text-gray-300 mb-6 text-lg">
                     Are you sure you want to delete this{" "}
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-emerald-400">
                         {itemToDelete.type}
                     </span>
                     ? This action cannot be undone.
@@ -733,7 +737,7 @@ const DeleteConfirmationModal = ({
                         whileTap={{ scale: 0.95 }}
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md"
+                        className="px-6 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors duration-200 shadow-md"
                     >
                         Cancel
                     </motion.button>
@@ -742,7 +746,7 @@ const DeleteConfirmationModal = ({
                         whileTap={{ scale: 0.95 }}
                         onClick={onDelete}
                         disabled={processing}
-                        className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-500 hover:to-red-600 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
+                        className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-500 hover:to-red-600 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
                     >
                         {processing ? (
                             <span className="animate-spin text-lg">⟳</span>
@@ -778,7 +782,7 @@ const CancelConfirmationModal = ({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2 }}
-                className="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border border-gray-700"
+                className="bg-gray-800/90 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full shadow-2xl border border-gray-700"
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-white flex items-center">
@@ -796,11 +800,11 @@ const CancelConfirmationModal = ({
                 </div>
                 <p className="text-gray-300 mb-6 text-lg">
                     Are you sure you want to cancel the booking for{" "}
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-emerald-400">
                         {entity?.name || entity?.title || "this item"}
                     </span>{" "}
                     by{" "}
-                    <span className="font-semibold text-green-400">
+                    <span className="font-semibold text-emerald-400">
                         {bookingToCancel.user?.name || "N/A"}
                     </span>
                     ? This action cannot be undone.
@@ -811,7 +815,7 @@ const CancelConfirmationModal = ({
                         whileTap={{ scale: 0.95 }}
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors duration-200 shadow-md"
+                        className="px-6 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition-colors duration-200 shadow-md"
                     >
                         Keep Booking
                     </motion.button>
@@ -820,7 +824,7 @@ const CancelConfirmationModal = ({
                         whileTap={{ scale: 0.95 }}
                         onClick={onCancel}
                         disabled={processing}
-                        className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-500 hover:to-red-600 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
+                        className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-500 hover:to-red-600 disabled:opacity-50 flex items-center justify-center space-x-2 transition-all duration-200 shadow-md"
                     >
                         {processing ? (
                             <span className="animate-spin text-lg">⟳</span>
@@ -892,14 +896,14 @@ const ItemCard = forwardRef(
                     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
                 }}
                 layout
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-b from-gray-800 to-gray-850 hover:from-gray-750 hover:to-gray-800 border border-gray-700 flex flex-col group transition-all duration-300"
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                className="bg-gray-800/80 rounded-xl overflow-hidden border border-gray-700 flex flex-col group transition-all duration-300"
             >
                 <div className="relative overflow-hidden">
                     <img
                         src={itemImage}
                         alt={itemTitle || "Image"}
-                        className="w-full h-56 object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                         onError={(e) => {
                             e.target.src = defaultImage;
@@ -917,7 +921,7 @@ const ItemCard = forwardRef(
                     ) : (
                         <>
                             {displayTag && (
-                                <span className="absolute top-3 left-3 px-3 py-1 bg-green-600 rounded-full text-xs font-medium text-white shadow-lg">
+                                <span className="absolute top-3 left-3 px-3 py-1 bg-emerald-600 rounded-full text-xs font-medium text-white shadow-lg">
                                     {displayTag.charAt(0).toUpperCase() +
                                         displayTag.slice(1)}
                                 </span>
@@ -934,11 +938,10 @@ const ItemCard = forwardRef(
                             )}
                         </>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
                 </div>
-                <div className="p-6 flex flex-col flex-grow">
+                <div className="p-5 flex flex-col flex-grow">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-xl font-bold line-clamp-1 text-white group-hover:text-green-300 transition-colors duration-300">
+                        <h3 className="text-xl font-bold line-clamp-1 text-white">
                             {itemTitle ||
                                 (isBooking &&
                                     (entity?.name || entity?.title)) ||
@@ -949,7 +952,7 @@ const ItemCard = forwardRef(
                         <div className="flex items-center gap-2 mb-2">
                             <User
                                 size={16}
-                                className="text-green-400 flex-shrink-0"
+                                className="text-emerald-400 flex-shrink-0"
                             />
                             <span className="text-sm text-gray-300">
                                 {item.user?.name || "N/A"}
@@ -963,7 +966,7 @@ const ItemCard = forwardRef(
                         <div className="flex items-center gap-2 mb-2">
                             <MapPin
                                 size={16}
-                                className="text-green-400 flex-shrink"
+                                className="text-emerald-400 flex-shrink-0"
                             />
                             <span className="text-sm text-gray-300">
                                 {item.location}
@@ -974,7 +977,7 @@ const ItemCard = forwardRef(
                         <div className="flex items-center gap-2 mb-2">
                             <MapPin
                                 size={16}
-                                className="text-green-400 flex-shrink"
+                                className="text-emerald-400 flex-shrink-0"
                             />
                             <span className="text-sm text-gray-300">
                                 {associatedDestinationName}
@@ -983,7 +986,7 @@ const ItemCard = forwardRef(
                     )}
                     {isBooking && (
                         <div className="flex items-center gap-2 mb-2">
-                            <Calendar size={16} className="text-green-400" />
+                            <Calendar size={16} className="text-emerald-400" />
                             <span className="text-sm text-gray-300">
                                 {formatDate(item.check_in)} -{" "}
                                 {formatDate(item.check_out)}
@@ -992,7 +995,7 @@ const ItemCard = forwardRef(
                     )}
                     {isBooking && (
                         <div className="flex items-center gap-2 mb-3">
-                            <User size={16} className="text-green-400" />
+                            <User size={16} className="text-emerald-400" />
                             <span className="text-sm text-gray-300">
                                 Guests: {item.guests}
                             </span>
@@ -1007,13 +1010,13 @@ const ItemCard = forwardRef(
                         </div>
                     )}
                     {!isBooking && (
-                        <p className="text-sm mb-4 line-clamp-2 text-gray-300 group-hover:text-gray-200 transition-colors duration-300">
+                        <p className="text-sm mb-4 line-clamp-2 text-gray-300">
                             {itemDescription || "No description available."}
                         </p>
                     )}
                     {(isOffer || isPackage) && item.end_date && (
                         <div className="flex items-center gap-2 mb-4">
-                            <Clock size={16} className="text-green-400" />
+                            <Clock size={16} className="text-emerald-400" />
                             <span className="text-sm text-gray-300">
                                 Valid until {formatDate(item.end_date)}
                             </span>
@@ -1030,13 +1033,13 @@ const ItemCard = forwardRef(
                                 <div className="flex items-baseline gap-2">
                                     {item.discount_price && !isBooking ? (
                                         <>
-                                            <span className="text-xl font-bold text-green-400 group-hover:text-green-300 transition-colors duration-300">
+                                            <span className="text-2xl font-bold text-emerald-400">
                                                 $
                                                 {parseFloat(
                                                     item.discount_price
                                                 ).toFixed(2)}
                                             </span>
-                                            <span className="text-sm line-through text-gray-400">
+                                            <span className="text-sm line-through text-gray-500">
                                                 $
                                                 {parseFloat(item.price).toFixed(
                                                     2
@@ -1044,7 +1047,7 @@ const ItemCard = forwardRef(
                                             </span>
                                         </>
                                     ) : (
-                                        <span className="text-xl font-bold text-green-400 group-hover:text-green-300 transition-colors duration-300">
+                                        <span className="text-2xl font-bold text-emerald-400">
                                             $
                                             {parseFloat(
                                                 item.price ||
@@ -1070,7 +1073,7 @@ const ItemCard = forwardRef(
                                         onClick={() =>
                                             handleConfirmBooking(item)
                                         }
-                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-base font-medium bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-500 hover:to-emerald-600 transition-all duration-300 transform group-hover:shadow-lg"
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 transform shadow-lg"
                                     >
                                         <Check className="w-4 h-4" />
                                         Confirm
@@ -1083,7 +1086,7 @@ const ItemCard = forwardRef(
                                         onClick={() =>
                                             handleCancelBooking(item)
                                         }
-                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-base font-medium bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:from-rose-500 hover:to-rose-600 transition-all duration-300 transform group-hover:shadow-lg"
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:from-rose-500 hover:to-rose-600 transition-all duration-300 transform shadow-lg"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                         Cancel
@@ -1108,48 +1111,50 @@ const ItemCard = forwardRef(
                                                     "is_featured"
                                                 )
                                             }
-                                            className="text-gray-400 hover:text-amber-400 p-1.5 rounded-full transition-all bg-gray-700/50 hover:bg-gray-700"
+                                            className="text-gray-400 hover:text-yellow-400 p-1.5 rounded-full transition-all bg-gray-700/50 hover:bg-gray-700"
                                             title="Toggle Featured"
                                         >
                                             {item.is_featured ? (
-                                                <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+                                                <Star
+                                                    size={18}
+                                                    className="fill-yellow-400 text-yellow-400"
+                                                />
                                             ) : (
-                                                <Star className="w-6 h-6" />
+                                                <Star size={18} />
                                             )}
                                         </motion.button>
                                     )}
-                                    {(isOffer ||
-                                        isPackage ||
-                                        isDestination) && (
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={() =>
-                                                handleToggle(
-                                                    item,
-                                                    type,
-                                                    "is_active"
-                                                )
-                                            }
-                                            className="text-gray-400 hover:text-emerald-400 p-1.5 rounded-full transition-all bg-gray-700/50 hover:bg-gray-700"
-                                            title="Toggle Active"
-                                        >
-                                            {item.is_active ? (
-                                                <ToggleRight className="w-6 h-6 text-emerald-500" />
-                                            ) : (
-                                                <ToggleLeft className="w-6 h-6" />
-                                            )}
-                                        </motion.button>
-                                    )}
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() =>
+                                            handleToggle(
+                                                item,
+                                                type,
+                                                "is_active"
+                                            )
+                                        }
+                                        className="text-gray-400 hover:text-emerald-400 p-1.5 rounded-full transition-all bg-gray-700/50 hover:bg-gray-700"
+                                        title="Toggle Active"
+                                    >
+                                        {item.is_active ? (
+                                            <ToggleRight
+                                                size={18}
+                                                className="text-emerald-400"
+                                            />
+                                        ) : (
+                                            <ToggleLeft size={18} />
+                                        )}
+                                    </motion.button>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-3">
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         onClick={() =>
                                             openEditModal(item, type)
                                         }
-                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-base font-medium bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-500 hover:to-green-600 transition-all duration-300 transform group-hover:shadow-lg"
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 transform shadow-lg"
                                     >
                                         <Edit2 className="w-4 h-4" />
                                         Edit
@@ -1160,7 +1165,7 @@ const ItemCard = forwardRef(
                                         onClick={() =>
                                             openDeleteModal(item, type)
                                         }
-                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-base font-medium bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:from-rose-500 hover:to-rose-600 transition-all duration-300 transform group-hover:shadow-lg"
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-base font-medium bg-gradient-to-r from-rose-600 to-rose-700 text-white hover:from-rose-500 hover:to-rose-600 transition-all duration-300 transform shadow-lg"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                         Delete
@@ -1175,122 +1180,117 @@ const ItemCard = forwardRef(
     }
 );
 
+ItemCard.displayName = "ItemCard";
+
 // --- Main Dashboard Component ---
 
-export default function Dashboard() {
-    const { props } = usePage();
-    const {
-        destinations = { data: [] },
-        offers = { data: [] },
-        packages = { data: [] },
-        bookings = { data: [] },
-        flash = {},
-        auth = { user: null },
-        company = null,
-    } = props;
-    const user = auth?.user || company;
+const CompanyDashboard = ({
+    auth,
+    destinations,
+    offers,
+    packages,
+    bookings,
+}) => {
+    const user = auth?.user || null;
+    const { flash } = usePage().props;
 
-    // State management
-    const [activeTab, setActiveTab] = useState("bookings");
+    const [activeTab, setActiveTab] = useState("destinations");
     const [searchQuery, setSearchQuery] = useState("");
-    const [showAddModal, setShowAddModal] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(null);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState(null);
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [itemToDelete, setItemToDelete] = useState(null);
     const [bookingToCancel, setBookingToCancel] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    const [isDarkMode, setIsDarkMode] = useState(true);
 
-    // Form data and Inertia.js `useForm` hook
     const {
         data,
         setData,
         post,
         put,
-        delete: deleteForm,
         patch,
+        delete: deleteForm,
         processing,
-        reset,
         errors,
+        reset,
     } = useForm({
         title: "",
+        subtitle: "",
         description: "",
+        location: "",
+        category: "",
         price: "",
         discount_price: "",
         image: null,
+        rating: "",
         is_featured: false,
         is_active: true,
-        location: "",
-        category: "",
-        rating: "",
-        subtitle: "",
+        destination_id: "",
         discount_type: "percentage",
         start_date: "",
         end_date: "",
-        destination_id: "",
-        // Additional fields for package
         duration: "",
         max_participants: "",
         includes: "",
     });
 
-    // Inject custom scrollbar styles on mount
     useEffect(() => {
         const cleanup = injectGlobalStyles();
         return cleanup;
     }, []);
 
-    // Handle flash messages from Inertia.js
     useEffect(() => {
-        if (flash.success) {
+        if (flash?.success) {
             toast.success(flash.success);
         }
-        if (flash.error) {
+        if (flash?.error) {
             toast.error(flash.error);
         }
     }, [flash]);
 
-    // Handle image change for forms
     const handleImageChange = useCallback(
         (e) => {
             const file = e.target.files[0];
-            setData("image", file);
-            setImagePreview(file ? URL.createObjectURL(file) : null);
+            if (file) {
+                setData("image", file);
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
         },
         [setData]
     );
 
-    // Remove image from form
     const removeImage = useCallback(() => {
         setData("image", null);
         setImagePreview(null);
     }, [setData]);
 
-    // Common success and error handlers for form submissions
     const handleFormSuccess = useCallback(
         (type) => {
-            setShowAddModal(null);
-            setShowEditModal(null);
+            setShowAddModal(false);
+            setShowEditModal(false);
             setSelectedItem(null);
             reset();
             setImagePreview(null);
             toast.success(
                 `${type.charAt(0).toUpperCase() + type.slice(1)} ${
-                    selectedItem ? "updated" : "created"
+                    selectedItem ? "updated" : "added"
                 } successfully!`
             );
         },
-        [reset, selectedItem]
+        [selectedItem, reset]
     );
 
-    const handleFormError = useCallback((inertiaErrors) => {
-        console.error("Form submission failed:", inertiaErrors);
-        toast.error("Please fix the form errors. Check console for details.");
+    const handleFormError = useCallback(() => {
+        toast.error("Failed to save. Please check the form for errors.");
     }, []);
 
-    // Handle adding a new item
+    // Handle adding new item
     const handleAdd = useCallback(
         (e) => {
             e.preventDefault();
@@ -1308,9 +1308,14 @@ export default function Dashboard() {
                 data.discount_price !== undefined
             )
                 formData.append("discount_price", data.discount_price);
-            if (data.image) formData.append("image", data.image);
+            else formData.append("discount_price", "");
             if (data.rating !== null && data.rating !== undefined)
                 formData.append("rating", data.rating);
+            else formData.append("rating", "");
+
+            if (data.image instanceof File) {
+                formData.append("image", data.image);
+            }
 
             if (type === "destination") {
                 formData.append("is_featured", data.is_featured ? "1" : "0");
@@ -1324,6 +1329,7 @@ export default function Dashboard() {
                 if (type === "package") {
                     if (data.subtitle !== null && data.subtitle !== undefined)
                         formData.append("subtitle", data.subtitle);
+                    else formData.append("subtitle", "");
                     formData.append(
                         "is_featured",
                         data.is_featured ? "1" : "0"
@@ -1331,57 +1337,22 @@ export default function Dashboard() {
                     // Add package-specific fields
                     if (data.duration)
                         formData.append("duration", data.duration);
+                    else formData.append("duration", "");
+
                     if (data.max_participants)
                         formData.append(
                             "max_participants",
                             data.max_participants
                         );
+                    else formData.append("max_participants", "");
+
                     if (data.includes)
                         formData.append("includes", data.includes);
+                    else formData.append("includes", "");
                 }
             }
 
-            if (!data.title) {
-                toast.error("Title is required.");
-                return;
-            }
-            if (!data.description) {
-                toast.error("Description is required.");
-                return;
-            }
-            if (!data.location) {
-                toast.error("Location is required.");
-                return;
-            }
-            if (!data.category) {
-                toast.error("Category is required.");
-                return;
-            }
-            if (!data.price || parseFloat(data.price) <= 0) {
-                toast.error("Valid price is required.");
-                return;
-            }
-            if (
-                (type === "offer" || type === "package") &&
-                !data.destination_id
-            ) {
-                toast.error("Associated Destination is required.");
-                return;
-            }
-            if (
-                (type === "offer" || type === "package") &&
-                (!data.start_date || !data.end_date)
-            ) {
-                toast.error("Start and End Dates are required.");
-                return;
-            }
-            if (type === "destination" && !data.image) {
-                toast.error("Image is required for destinations.");
-                return;
-            }
-
-            post(route(`company.${type}s.store`), {
-                data: formData,
+            post(route(`company.${type}s.store`), formData, {
                 preserveScroll: true,
                 forceFormData: true,
                 onSuccess: () => handleFormSuccess(type),
@@ -1469,7 +1440,7 @@ export default function Dashboard() {
             selectedItem,
             showEditModal,
             data,
-            post,
+            put,
             handleFormSuccess,
             handleFormError,
         ]
@@ -1598,6 +1569,9 @@ export default function Dashboard() {
                     formatISOToDateInput(item.end_date) || "";
                 if (type === "package") {
                     initialData.subtitle = item.subtitle || "";
+                    initialData.duration = item.duration || "";
+                    initialData.max_participants = item.max_participants || "";
+                    initialData.includes = item.includes || "";
                 }
             }
             setData(initialData);
@@ -1665,263 +1639,283 @@ export default function Dashboard() {
         let itemsToRender = [];
         let currentType = "";
 
-        if (activeTab === "bookings") {
-            itemsToRender = filteredBookings;
-            currentType = "booking";
-        } else if (activeTab === "destinations") {
-            itemsToRender = filteredDestinations;
-            currentType = "destination";
-        } else if (activeTab === "offers") {
-            itemsToRender = filteredOffers;
-            currentType = "offer";
-        } else if (activeTab === "packages") {
-            itemsToRender = filteredPackages;
-            currentType = "package";
+        switch (activeTab) {
+            case "destinations":
+                itemsToRender = filteredDestinations;
+                currentType = "destination";
+                break;
+            case "offers":
+                itemsToRender = filteredOffers;
+                currentType = "offer";
+                break;
+            case "packages":
+                itemsToRender = filteredPackages;
+                currentType = "package";
+                break;
+            case "bookings":
+                itemsToRender = filteredBookings;
+                currentType = "booking";
+                break;
+            default:
+                itemsToRender = [];
         }
 
         if (itemsToRender.length === 0) {
             return (
                 <motion.div
-                    variants={{
-                        hidden: { opacity: 0, y: 20 },
-                        visible: {
-                            opacity: 1,
-                            y: 0,
-                            transition: { duration: 0.5 },
-                        },
-                    }}
-                    className="col-span-full text-center py-16"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center py-16 bg-gray-800/50 rounded-2xl border border-gray-700"
                 >
-                    <div className="max-w-md mx-auto">
-                        <Search className="w-16 h-16 mx-auto mb-4 text-gray-600" />
-                        <h3 className="text-2xl font-bold mb-2 text-white">
-                            No{" "}
+                    <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-2xl font-semibold mb-2 text-white">
+                        No {activeTab} found
+                    </h3>
+                    <p className="text-gray-400 mb-6">
+                        {searchQuery
+                            ? "Try adjusting your search query"
+                            : `Start by adding your first ${currentType}`}
+                    </p>
+                    {!searchQuery && activeTab !== "bookings" && (
+                        <button
+                            onClick={() => openAddModal(currentType)}
+                            className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-lg inline-flex items-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Add{" "}
                             {currentType.charAt(0).toUpperCase() +
                                 currentType.slice(1)}
-                            s Found
-                        </h3>
-                        <p className="text-base mb-6 text-gray-400">
-                            {currentType === "booking"
-                                ? "There are no bookings to display."
-                                : `Add new ${currentType}s to manage your offerings.`}
-                        </p>
-                    </div>
+                        </button>
+                    )}
                 </motion.div>
             );
         }
 
-        return itemsToRender.map((item) => (
-            <ItemCard
-                key={`${currentType}-${item.id}`}
-                item={item}
-                type={currentType}
-                openEditModal={openEditModal}
-                openDeleteModal={openDeleteModal}
-                handleToggle={handleToggle}
-                handleCancelBooking={handleCancelBooking}
-                handleConfirmBooking={handleConfirmBooking}
-                availableDestinations={availableDestinations}
-            />
-        ));
+        return (
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                    hidden: { opacity: 0 },
+                    visible: {
+                        opacity: 1,
+                        transition: { staggerChildren: 0.1 },
+                    },
+                }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+                <AnimatePresence mode="popLayout">
+                    {itemsToRender.map((item) => (
+                        <ItemCard
+                            key={`${currentType}-${item.id}`}
+                            item={item}
+                            type={currentType}
+                            openEditModal={openEditModal}
+                            openDeleteModal={openDeleteModal}
+                            handleToggle={handleToggle}
+                            handleCancelBooking={handleCancelBooking}
+                            handleConfirmBooking={handleConfirmBooking}
+                            availableDestinations={availableDestinations}
+                        />
+                    ))}
+                </AnimatePresence>
+            </motion.div>
+        );
     };
 
+    const tabs = [
+        { id: "destinations", label: "Destinations", icon: MapPin },
+        { id: "offers", label: "Offers", icon: Tag },
+        { id: "packages", label: "Packages", icon: Award },
+        { id: "bookings", label: "Bookings", icon: BookOpenCheck },
+    ];
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <div className="min-h-screen bg-gray-950 text-white">
             <Head>
                 <title>Company Dashboard - Triplus</title>
                 <meta
                     name="description"
-                    content="Manage your bookings, destinations, offers, and packages with Triplus."
+                    content="Manage your travel company's destinations, offers, packages, and bookings."
                 />
             </Head>
             <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-
-            <Navbar
-                user={user}
-                isDarkMode={isDarkMode}
-                toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-            />
+            <Navbar user={user} />
 
             {/* Hero Section */}
-            <section className="relative h-80 md:h-80 w-full overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 to-gray-800/80"></div>
-                <div className="absolute inset-0 bg-[url('/images/world.png')] bg-no-repeat bg-center opacity-50"></div>
-                <div className="absolute inset-0 flex items-center justify-center px-6">
+            <section className="relative pt-28 pb-16 md:pt-36 md:pb-20 bg-gradient-to-b from-emerald-950/70 via-gray-950 to-gray-950">
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-600/20 rounded-full blur-3xl animate-pulse" />
+                    <div
+                        className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-600/20 rounded-full blur-3xl animate-pulse"
+                        style={{ animationDelay: "1s" }}
+                    />
+                </div>
+                <div className="relative max-w-6xl mx-auto px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center"
+                        className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full"
                     >
-                        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white">
-                            Company{" "}
-                            <span className="text-green-500">Dashboard</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
-                            Manage your bookings, destinations, offers, and
-                            packages with ease
+                        <Sparkles className="w-4 h-4 text-emerald-400" />
+                        <span className="text-sm font-semibold text-emerald-400">
+                            Company Dashboard
+                        </span>
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 35 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, ease: "easeOut" }}
+                        className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6"
+                    >
+                        Manage Your{" "}
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400">
+                            Travel Business
+                        </span>
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25, duration: 0.7 }}
+                        className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-10"
+                    >
+                        Control destinations, offers, packages, and bookings all
+                        in one place
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.45, duration: 0.6 }}
+                        className="inline-block w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                    />
+                </div>
+            </section>
+
+            <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+                {/* Tabs & Search */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-10"
+                >
+                    {/* Tab Navigation */}
+                    <div className="flex flex-wrap gap-3 mb-6">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => {
+                                    setActiveTab(tab.id);
+                                    setSearchQuery("");
+                                }}
+                                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all duration-300 ${
+                                    activeTab === tab.id
+                                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg"
+                                        : "bg-gray-800/70 text-gray-400 hover:text-white hover:bg-gray-700 border border-gray-700"
+                                }`}
+                            >
+                                <tab.icon size={20} />
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Search & Add Button */}
+                    <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+                        <div className="relative flex-1 max-w-md">
+                            <input
+                                type="text"
+                                placeholder={`Search ${activeTab}...`}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-800/70 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        </div>
+
+                        {activeTab !== "bookings" && (
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() =>
+                                    openAddModal(
+                                        activeTab === "destinations"
+                                            ? "destination"
+                                            : activeTab === "offers"
+                                            ? "offer"
+                                            : "package"
+                                    )
+                                }
+                                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-500 hover:to-teal-500 transition-all duration-300 shadow-lg"
+                            >
+                                <Plus size={20} />
+                                <span>
+                                    Add{" "}
+                                    {activeTab === "destinations"
+                                        ? "Destination"
+                                        : activeTab === "offers"
+                                        ? "Offer"
+                                        : "Package"}
+                                </span>
+                            </motion.button>
+                        )}
+                    </div>
+
+                    {/* Results Count */}
+                    <div className="mt-6 text-sm text-gray-400">
+                        <p>
+                            Showing{" "}
+                            {activeTab === "destinations" &&
+                                filteredDestinations.length}
+                            {activeTab === "offers" && filteredOffers.length}
+                            {activeTab === "packages" &&
+                                filteredPackages.length}
+                            {activeTab === "bookings" &&
+                                filteredBookings.length}{" "}
+                            {activeTab}
                         </p>
-                    </motion.div>
-                </div>
-            </section>
+                    </div>
+                </motion.div>
 
-            {/* Main Content */}
-            <section className="py-14 bg-gradient-to-b from-gray-900 to-gray-950">
-                <div className="max-w-7xl mx-auto px-6 md:px-16">
-                    {/* Tabs */}
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: {
-                                opacity: 1,
-                                y: 0,
-                                transition: { duration: 0.5 },
-                            },
-                        }}
-                        className="mb-8"
-                    >
-                        <div className="flex flex-wrap justify-center border-b border-gray-700/50">
-                            <button
-                                onClick={() => setActiveTab("bookings")}
-                                className={`flex-1 sm:flex-none py-3 px-6 text-center font-semibold text-lg transition-all duration-300 rounded-t-lg ${
-                                    activeTab === "bookings"
-                                        ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg"
-                                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-                                }`}
-                            >
-                                <BookOpenCheck className="inline-block w-5 h-5 mr-2" />
-                                Bookings
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("destinations")}
-                                className={`flex-1 sm:flex-none py-3 px-6 text-center font-semibold text-lg transition-all duration-300 rounded-t-lg ${
-                                    activeTab === "destinations"
-                                        ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg"
-                                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-                                }`}
-                            >
-                                <MapPin className="inline-block w-5 h-5 mr-2" />
-                                Destinations
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("offers")}
-                                className={`flex-1 sm:flex-none py-3 px-6 text-center font-semibold text-lg transition-all duration-300 rounded-t-lg ${
-                                    activeTab === "offers"
-                                        ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg"
-                                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-                                }`}
-                            >
-                                <Tag className="inline-block w-5 h-5 mr-2" />
-                                Offers
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("packages")}
-                                className={`flex-1 sm:flex-none py-3 px-6 text-center font-semibold text-lg transition-all duration-300 rounded-t-lg ${
-                                    activeTab === "packages"
-                                        ? "bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg"
-                                        : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-                                }`}
-                            >
-                                <Building2 className="inline-block w-5 h-5 mr-2" />
-                                Packages
-                            </button>
-                        </div>
-                    </motion.div>
+                {/* Tab Content */}
+                {renderCurrentTabContent()}
+            </div>
 
-                    {/* Search and Add Button */}
-                    <motion.div
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: {
-                                opacity: 1,
-                                y: 0,
-                                transition: { duration: 0.5, delay: 0.2 },
-                            },
-                        }}
-                        className="mb-12"
-                    >
-                        <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-                            <div className="relative w-full md:w-96">
-                                <input
-                                    type="text"
-                                    placeholder={`Search ${activeTab}...`}
-                                    value={searchQuery}
-                                    onChange={(e) =>
-                                        setSearchQuery(e.target.value)
-                                    }
-                                    className="w-full pl-12 pr-4 py-3 rounded-full text-lg bg-gray-800/80 text-gray-300 border-gray-700 border focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 shadow-md"
-                                />
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            </div>
-                            {activeTab !== "bookings" && (
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() =>
-                                        openAddModal(activeTab.slice(0, -1))
-                                    }
-                                    className="flex items-center gap-2 px-6 py-3 rounded-full text-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-500 hover:to-emerald-600 border border-emerald-500/30 transition-all duration-300 shadow-md"
-                                >
-                                    <Plus className="w-5 h-5" />
-                                    <span>Add {activeTab.slice(0, -1)}</span>
-                                </motion.button>
-                            )}
-                        </div>
-                        <div className="flex justify-between items-center mb-6">
-                            <p className="text-sm text-gray-400 flex items-center">
-                                <ChevronRight className="w-4 h-4 mr-1" />
-                                Showing{" "}
-                                {activeTab === "bookings"
-                                    ? filteredBookings.length
-                                    : activeTab === "destinations"
-                                    ? filteredDestinations.length
-                                    : activeTab === "offers"
-                                    ? filteredOffers.length
-                                    : filteredPackages.length}{" "}
-                                {activeTab}
-                            </p>
-                        </div>
-                    </motion.div>
-
-                    {/* Cards Grid */}
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        variants={{
-                            hidden: { opacity: 0 },
-                            visible: {
-                                opacity: 1,
-                                transition: { staggerChildren: 0.1 },
-                            },
-                        }}
-                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-16"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {renderCurrentTabContent()}
-                        </AnimatePresence>
-                    </motion.div>
-                </div>
-            </section>
-
-            {/* Add/Edit Modal */}
+            {/* Modals */}
             <AnimatePresence>
-                {(showAddModal || showEditModal) && (
+                {showAddModal && (
                     <AddEditModal
-                        showModal={showAddModal || showEditModal}
+                        showModal={showAddModal}
                         onClose={() => {
-                            setShowAddModal(null);
-                            setShowEditModal(null);
+                            setShowAddModal(false);
+                            reset();
+                            setImagePreview(null);
+                        }}
+                        onSubmit={handleAdd}
+                        processing={processing}
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        imagePreview={imagePreview}
+                        handleImageChange={handleImageChange}
+                        removeImage={removeImage}
+                        availableDestinations={availableDestinations}
+                        selectedItem={null}
+                    />
+                )}
+
+                {showEditModal && (
+                    <AddEditModal
+                        showModal={showEditModal}
+                        onClose={() => {
+                            setShowEditModal(false);
                             setSelectedItem(null);
                             reset();
                             setImagePreview(null);
                         }}
-                        onSubmit={showAddModal ? handleAdd : handleEdit}
+                        onSubmit={handleEdit}
                         processing={processing}
                         data={data}
                         setData={setData}
@@ -1933,10 +1927,7 @@ export default function Dashboard() {
                         selectedItem={selectedItem}
                     />
                 )}
-            </AnimatePresence>
 
-            {/* Delete Modal */}
-            <AnimatePresence>
                 {showDeleteModal && (
                     <DeleteConfirmationModal
                         showModal={showDeleteModal}
@@ -1949,10 +1940,7 @@ export default function Dashboard() {
                         itemToDelete={itemToDelete}
                     />
                 )}
-            </AnimatePresence>
 
-            {/* Cancel Booking Modal */}
-            <AnimatePresence>
                 {showCancelModal && (
                     <CancelConfirmationModal
                         showModal={showCancelModal}
@@ -1970,4 +1958,6 @@ export default function Dashboard() {
             <Footer />
         </div>
     );
-}
+};
+
+export default CompanyDashboard;

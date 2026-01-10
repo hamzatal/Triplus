@@ -678,7 +678,7 @@ const UserBookings = ({ auth }) => {
                                             : "You haven't saved any destinations yet."}
                                     </p>
                                     <Link
-                                        href="/book-now"
+                                        href="/booking"
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl font-semibold hover:shadow-lg transition-all"
                                     >
                                         Explore Now

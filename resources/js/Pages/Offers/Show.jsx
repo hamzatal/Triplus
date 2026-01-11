@@ -21,6 +21,7 @@ import {
     Zap,
     Percent,
     TrendingUp,
+    AlertTriangle,
 } from "lucide-react";
 import Navbar from "../../Components/Nav";
 import Footer from "../../Components/Footer";
@@ -35,6 +36,9 @@ export default function Show({ offer = {}, auth }) {
     const user = auth?.user || null;
 
     const canGoBack = window.history.length > 2;
+
+    // التحقق من انتهاء العرض
+    const isOfferExpired = offer.is_expired || false;
 
     const handleBack = () => {
         window.history.back();
@@ -239,23 +243,34 @@ export default function Show({ offer = {}, auth }) {
                                 >
                                     {/* Badges */}
                                     <div className="flex flex-wrap gap-2">
-                                        <span className="px-4 py-1.5 bg-amber-500/20 border border-amber-500/30 backdrop-blur-sm text-amber-400 rounded-full text-sm font-semibold flex items-center gap-2">
-                                            <Zap className="w-4 h-4" />
-                                            Special Offer
-                                        </span>
-                                        {offer.discount_type && (
-                                            <span className="px-4 py-1.5 bg-orange-500/20 border border-orange-500/30 backdrop-blur-sm text-orange-400 rounded-full text-sm font-semibold">
-                                                {offer.discount_type}
-                                            </span>
-                                        )}
-                                        {discount > 0 && (
-                                            <span className="px-4 py-1.5 bg-red-600 text-white rounded-full text-sm font-bold">
-                                                {discount}% OFF
-                                            </span>
-                                        )}
-                                        {daysLeft !== null && daysLeft <= 7 && (
-                                            <span className="px-4 py-1.5 bg-red-600 text-white rounded-full text-sm font-bold animate-pulse">
-                                                {daysLeft} Days Left!
+                                        {!isOfferExpired ? (
+                                            <>
+                                                <span className="px-4 py-1.5 bg-amber-500/20 border border-amber-500/30 backdrop-blur-sm text-amber-400 rounded-full text-sm font-semibold flex items-center gap-2">
+                                                    <Zap className="w-4 h-4" />
+                                                    Special Offer
+                                                </span>
+                                                {offer.discount_type && (
+                                                    <span className="px-4 py-1.5 bg-orange-500/20 border border-orange-500/30 backdrop-blur-sm text-orange-400 rounded-full text-sm font-semibold">
+                                                        {offer.discount_type}
+                                                    </span>
+                                                )}
+                                                {discount > 0 && (
+                                                    <span className="px-4 py-1.5 bg-red-600 text-white rounded-full text-sm font-bold">
+                                                        {discount}% OFF
+                                                    </span>
+                                                )}
+                                                {daysLeft !== null &&
+                                                    daysLeft <= 7 && (
+                                                        <span className="px-4 py-1.5 bg-red-600 text-white rounded-full text-sm font-bold animate-pulse">
+                                                            {daysLeft} Days
+                                                            Left!
+                                                        </span>
+                                                    )}
+                                            </>
+                                        ) : (
+                                            <span className="px-4 py-1.5 bg-red-600/20 border border-red-500/30 backdrop-blur-sm text-red-400 rounded-full text-sm font-semibold flex items-center gap-2">
+                                                <AlertTriangle className="w-4 h-4" />
+                                                Offer Expired
                                             </span>
                                         )}
                                     </div>
@@ -303,60 +318,84 @@ export default function Show({ offer = {}, auth }) {
                                 transition={{ delay: 0.2 }}
                                 className="lg:block hidden"
                             >
-                                <div className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
-                                    <div className="text-center mb-4">
-                                        <p className="text-sm text-gray-400 mb-2">
-                                            Special Price
-                                        </p>
-                                        <div className="flex items-baseline justify-center gap-2">
-                                            <span className="text-4xl font-bold text-amber-400">
-                                                ${formatPrice(basePrice)}
-                                            </span>
-                                            {offer.discount_price && (
-                                                <span className="text-xl text-gray-500 line-through">
-                                                    ${formatPrice(offer.price)}
+                                {!isOfferExpired ? (
+                                    <div className="bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+                                        <div className="text-center mb-4">
+                                            <p className="text-sm text-gray-400 mb-2">
+                                                Special Price
+                                            </p>
+                                            <div className="flex items-baseline justify-center gap-2">
+                                                <span className="text-4xl font-bold text-amber-400">
+                                                    ${formatPrice(basePrice)}
                                                 </span>
-                                            )}
+                                                {offer.discount_price && (
+                                                    <span className="text-xl text-gray-500 line-through">
+                                                        $
+                                                        {formatPrice(
+                                                            offer.price
+                                                        )}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                per person
+                                            </p>
                                         </div>
-                                        <p className="text-sm text-gray-400 mt-1">
-                                            per person
-                                        </p>
-                                    </div>
 
-                                    <div className="space-y-3">
-                                        <Link
-                                            href={`/book?offer_id=${offer.id}`}
-                                            className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-center py-3 rounded-xl font-semibold transition-all shadow-lg shadow-amber-500/20"
-                                        >
-                                            Grab This Deal
-                                        </Link>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={toggleFavorite}
-                                                disabled={loadingFavorite}
-                                                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
-                                                    favoriteState.is_favorite
-                                                        ? "bg-red-600 border-red-500 text-white"
-                                                        : "bg-transparent border-gray-700 text-gray-300 hover:border-amber-500"
-                                                }`}
+                                        <div className="space-y-3">
+                                            <Link
+                                                href={`/book?offer_id=${offer.id}`}
+                                                className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-center py-3 rounded-xl font-semibold transition-all shadow-lg shadow-amber-500/20"
                                             >
-                                                <Heart
-                                                    className={`w-5 h-5 ${
+                                                Grab This Deal
+                                            </Link>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={toggleFavorite}
+                                                    disabled={loadingFavorite}
+                                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
                                                         favoriteState.is_favorite
-                                                            ? "fill-white"
-                                                            : ""
+                                                            ? "bg-red-600 border-red-500 text-white"
+                                                            : "bg-transparent border-gray-700 text-gray-300 hover:border-amber-500"
                                                     }`}
-                                                />
-                                            </button>
-                                            <button
-                                                onClick={handleShare}
-                                                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-amber-500 transition-all"
-                                            >
-                                                <Share2 className="w-5 h-5" />
-                                            </button>
+                                                >
+                                                    <Heart
+                                                        className={`w-5 h-5 ${
+                                                            favoriteState.is_favorite
+                                                                ? "fill-white"
+                                                                : ""
+                                                        }`}
+                                                    />
+                                                </button>
+                                                <button
+                                                    onClick={handleShare}
+                                                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-amber-500 transition-all"
+                                                >
+                                                    <Share2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div className="bg-red-900/30 backdrop-blur-sm border border-red-500 rounded-2xl p-6 text-center">
+                                        <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <AlertTriangle className="w-8 h-8 text-white" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-red-400 mb-2">
+                                            Offer Expired
+                                        </h3>
+                                        <p className="text-gray-300 text-sm mb-4">
+                                            This offer is no longer available
+                                            for booking
+                                        </p>
+                                        <Link
+                                            href="/offers"
+                                            className="inline-block px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-xl transition font-semibold"
+                                        >
+                                            View Active Offers
+                                        </Link>
+                                    </div>
+                                )}
                             </motion.div>
                         </div>
                     </div>
@@ -368,6 +407,38 @@ export default function Show({ offer = {}, auth }) {
                 <div className="grid lg:grid-cols-3 gap-12">
                     {/* Left Column - Main Content */}
                     <div className="lg:col-span-2 space-y-12">
+                        {/* Expired Warning Banner - Mobile & Desktop */}
+                        {isOfferExpired && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-red-900/30 border border-red-500 rounded-2xl p-6"
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center">
+                                        <AlertTriangle className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold text-red-400 mb-2">
+                                            ⚠️ This Offer Has Expired
+                                        </h3>
+                                        <p className="text-gray-300 mb-4">
+                                            This offer ended on{" "}
+                                            {formatDate(offer.end_date)} and is
+                                            no longer available for booking.
+                                            Check out our other active offers!
+                                        </p>
+                                        <Link
+                                            href="/offers"
+                                            className="inline-block px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition font-semibold"
+                                        >
+                                            Browse Active Offers
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Quick Info Cards */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -394,35 +465,39 @@ export default function Show({ offer = {}, auth }) {
                             </div>
                         </motion.div>
 
-                        {/* Urgency Banner */}
-                        {daysLeft !== null && daysLeft <= 7 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border border-red-500/30 rounded-2xl p-6"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center animate-pulse">
-                                        <Zap className="w-6 h-6 text-white" />
+                        {/* Urgency Banner - only if not expired */}
+                        {!isOfferExpired &&
+                            daysLeft !== null &&
+                            daysLeft <= 7 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border border-red-500/30 rounded-2xl p-6"
+                                >
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center animate-pulse">
+                                            <Zap className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-bold text-red-400 mb-2">
+                                                ⚡ Limited Time Offer!
+                                            </h3>
+                                            <p className="text-gray-300">
+                                                {daysLeft === 0
+                                                    ? "This offer ends today! "
+                                                    : `Only ${daysLeft} day${
+                                                          daysLeft !== 1
+                                                              ? "s"
+                                                              : ""
+                                                      } left to grab this amazing deal! `}
+                                                Don't miss out on these special
+                                                savings.
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-bold text-red-400 mb-2">
-                                            ⚡ Limited Time Offer!
-                                        </h3>
-                                        <p className="text-gray-300">
-                                            {daysLeft === 0
-                                                ? "This offer ends today! "
-                                                : `Only ${daysLeft} day${
-                                                      daysLeft !== 1 ? "s" : ""
-                                                  } left to grab this amazing deal! `}
-                                            Don't miss out on these special
-                                            savings.
-                                        </p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
+                                </motion.div>
+                            )}
 
                         {/* Description Section */}
                         <motion.div
@@ -505,6 +580,11 @@ export default function Show({ offer = {}, auth }) {
                                             {formatDate(offer.start_date)} -{" "}
                                             {formatDate(offer.end_date)}
                                         </p>
+                                        {isOfferExpired && (
+                                            <p className="text-red-400 text-sm mt-2 font-semibold">
+                                                ⚠️ This offer has expired
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 {offer.max_guests && (
@@ -567,232 +647,214 @@ export default function Show({ offer = {}, auth }) {
                         >
                             {/* Main Booking Card */}
                             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
-                                <div className="text-center mb-6">
-                                    <p className="text-sm text-gray-400 mb-2">
-                                        Special Price
-                                    </p>
-                                    <div className="flex items-baseline justify-center gap-2">
-                                        <span className="text-4xl font-bold text-amber-400">
-                                            ${formatPrice(basePrice)}
-                                        </span>
-                                        {offer.discount_price && (
-                                            <span className="text-xl text-gray-500 line-through">
-                                                ${formatPrice(offer.price)}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        per person
-                                    </p>
-                                    {discount > 0 && (
-                                        <p className="text-emerald-400 font-semibold mt-2">
-                                            Save $
-                                            {formatPrice(
-                                                parseFloat(offer.price) -
-                                                    basePrice
-                                            )}{" "}
-                                            ({discount}% OFF)
-                                        </p>
-                                    )}
-                                </div>
-
-                                {/* Price Breakdown */}
-                                <div className="space-y-3 mb-6 bg-gray-900/50 rounded-xl p-4">
-                                    <h4 className="text-sm font-semibold text-gray-400 mb-3">
-                                        PRICE BREAKDOWN
-                                    </h4>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Base price
-                                        </span>
-                                        <span className="text-white">
-                                            ${formatPrice(basePrice)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Service fee
-                                        </span>
-                                        <span className="text-white">
-                                            ${formatPrice(serviceFee)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-400">
-                                            Booking fee
-                                        </span>
-                                        <span className="text-white">
-                                            ${formatPrice(bookingFee)}
-                                        </span>
-                                    </div>
-                                    {discount > 0 && (
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-amber-400">
-                                                Discount ({discount}%)
-                                            </span>
-                                            <span className="text-amber-400">
-                                                -$
-                                                {formatPrice(
-                                                    parseFloat(offer.price) -
-                                                        basePrice
+                                {!isOfferExpired ? (
+                                    <>
+                                        <div className="text-center mb-6">
+                                            <p className="text-sm text-gray-400 mb-2">
+                                                Special Price
+                                            </p>
+                                            <div className="flex items-baseline justify-center gap-2">
+                                                <span className="text-4xl font-bold text-amber-400">
+                                                    ${formatPrice(basePrice)}
+                                                </span>
+                                                {offer.discount_price && (
+                                                    <span className="text-xl text-gray-500 line-through">
+                                                        $
+                                                        {formatPrice(
+                                                            offer.price
+                                                        )}
+                                                    </span>
                                                 )}
-                                            </span>
+                                            </div>
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                per person
+                                            </p>
+                                            {discount > 0 && (
+                                                <p className="text-emerald-400 font-semibold mt-2">
+                                                    Save $
+                                                    {formatPrice(
+                                                        parseFloat(
+                                                            offer.price
+                                                        ) - basePrice
+                                                    )}{" "}
+                                                    ({discount}% OFF)
+                                                </p>
+                                            )}
                                         </div>
-                                    )}
-                                    <div className="border-t border-gray-700 pt-3 flex justify-between font-bold">
-                                        <span>Total</span>
-                                        <span className="text-amber-400 text-lg">
-                                            ${formatPrice(totalPrice)}
-                                        </span>
-                                    </div>
-                                </div>
 
-                                {/* Action Buttons */}
-                                <div className="space-y-3">
-                                    <Link
-                                        href={`/book?offer_id=${offer.id}`}
-                                        className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-center py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-amber-500/20"
-                                    >
-                                        Grab This Deal
-                                    </Link>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            onClick={toggleFavorite}
-                                            disabled={loadingFavorite}
-                                            className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
-                                                favoriteState.is_favorite
-                                                    ? "bg-red-600 border-red-500 text-white"
-                                                    : "bg-transparent border-gray-700 text-gray-300 hover:border-amber-500"
-                                            }`}
-                                        >
-                                            <Heart
-                                                className={`w-5 h-5 ${
-                                                    favoriteState.is_favorite
-                                                        ? "fill-white"
-                                                        : ""
-                                                }`}
-                                            />
-                                            <span className="text-sm">
-                                                {favoriteState.is_favorite
-                                                    ? "Saved"
-                                                    : "Save"}
-                                            </span>
-                                        </button>
-                                        <button
-                                            onClick={handleShare}
-                                            className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-amber-500 transition-all"
-                                        >
-                                            <Share2 className="w-5 h-5" />
-                                            <span className="text-sm">
-                                                Share
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
+                                        {/* Price Breakdown */}
+                                        <div className="space-y-3 mb-6 bg-gray-900/50 rounded-xl p-4">
+                                            <h4 className="text-sm font-semibold text-gray-400 mb-3">
+                                                PRICE BREAKDOWN
+                                            </h4>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-400">
+                                                    Base price
+                                                </span>
+                                                <span className="text-white">
+                                                    ${formatPrice(basePrice)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-400">
+                                                    Service fee
+                                                </span>
+                                                <span className="text-white">
+                                                    ${formatPrice(serviceFee)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-400">
+                                                    Booking fee
+                                                </span>
+                                                <span className="text-white">
+                                                    ${formatPrice(bookingFee)}
+                                                </span>
+                                            </div>
+                                            {discount > 0 && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-amber-400">
+                                                        Discount ({discount}%)
+                                                    </span>
+                                                    <span className="text-amber-400">
+                                                        -$
+                                                        {formatPrice(
+                                                            parseFloat(
+                                                                offer.price
+                                                            ) - basePrice
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="border-t border-gray-700 pt-3 flex justify-between font-bold">
+                                                <span>Total</span>
+                                                <span className="text-amber-400 text-lg">
+                                                    ${formatPrice(totalPrice)}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                <p className="text-center text-xs text-gray-500 mt-4">
-                                    🔒 No payment required to book
-                                </p>
+                                        {/* Action Buttons */}
+                                        <div className="space-y-3">
+                                            <Link
+                                                href={`/book?offer_id=${offer.id}`}
+                                                className="block w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-center py-3.5 rounded-xl font-semibold transition-all shadow-lg shadow-amber-500/20"
+                                            >
+                                                Grab This Deal
+                                            </Link>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    onClick={toggleFavorite}
+                                                    disabled={loadingFavorite}
+                                                    className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
+                                                        favoriteState.is_favorite
+                                                            ? "bg-red-600 border-red-500 text-white"
+                                                            : "bg-transparent border-gray-700 text-gray-300 hover:border-amber-500"
+                                                    }`}
+                                                >
+                                                    <Heart
+                                                        className={`w-5 h-5 ${
+                                                            favoriteState.is_favorite
+                                                                ? "fill-white"
+                                                                : ""
+                                                        }`}
+                                                    />
+                                                    <span className="text-sm">
+                                                        {favoriteState.is_favorite
+                                                            ? "Saved"
+                                                            : "Save"}
+                                                    </span>
+                                                </button>
+                                                <button
+                                                    onClick={handleShare}
+                                                    className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-700 text-gray-300 hover:border-amber-500 transition-all"
+                                                >
+                                                    <Share2 className="w-5 h-5" />
+                                                    <span className="text-sm">
+                                                        Share
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-center text-xs text-gray-500 mt-4">
+                                            🔒 No payment required to book
+                                        </p>
+                                    </>
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <AlertTriangle className="w-10 h-10 text-white" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-red-400 mb-3">
+                                            Offer Expired
+                                        </h3>
+                                        <p className="text-gray-300 text-sm mb-6">
+                                            This offer is no longer available
+                                            for booking. Check out our other
+                                            active offers!
+                                        </p>
+                                        <Link
+                                            href="/offers"
+                                            className="inline-block px-6 py-3 bg-amber-600 hover:bg-amber-700 rounded-xl transition font-semibold text-white"
+                                        >
+                                            View Active Offers
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Trust Badges */}
-                            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
-                                <h4 className="font-semibold mb-4 flex items-center gap-2">
-                                    <Shield className="w-5 h-5 text-amber-400" />
-                                    Why Book This Offer?
-                                </h4>
-                                <div className="space-y-3">
-                                    <div className="flex items-start gap-3">
-                                        <TrendingUp className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                Best Value
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                Exclusive pricing you won't find
-                                                elsewhere
-                                            </p>
+                            {/* Trust Badges - only if not expired */}
+                            {!isOfferExpired && (
+                                <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+                                    <h4 className="font-semibold mb-4 flex items-center gap-2">
+                                        <Shield className="w-5 h-5 text-amber-400" />
+                                        Why Book This Offer?
+                                    </h4>
+                                    <div className="space-y-3">
+                                        <div className="flex items-start gap-3">
+                                            <TrendingUp className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm font-medium">
+                                                    Best Value
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    Exclusive pricing you won't
+                                                    find elsewhere
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <Zap className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                Limited Time
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                Don't miss this special
-                                                opportunity
-                                            </p>
+                                        <div className="flex items-start gap-3">
+                                            <Zap className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm font-medium">
+                                                    Limited Time
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    Don't miss this special
+                                                    opportunity
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex items-start gap-3">
-                                        <Shield className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                Secure Booking
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                Your information is protected
-                                            </p>
+                                        <div className="flex items-start gap-3">
+                                            <Shield className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                            <div>
+                                                <p className="text-sm font-medium">
+                                                    Secure Booking
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    Your information is
+                                                    protected
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </motion.div>
                     </div>
                 </div>
-
-                {/* Bottom CTA */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="mt-20 bg-gradient-to-r from-amber-900/50 to-orange-900/50 border border-amber-500/30 rounded-3xl p-12 text-center"
-                >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        Don't Miss This{" "}
-                        <span className="text-amber-400">Amazing Deal</span>!
-                    </h2>
-                    <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-                        This special offer won't last forever. Book now and save
-                        big on your next adventure!
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link
-                            href={`/book?offer_id=${offer.id}`}
-                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-                        >
-                            Grab This Offer Now
-                            <Zap className="w-5 h-5" />
-                        </Link>
-                        <Link
-                            href="/offers"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-amber-500 rounded-xl font-semibold hover:bg-amber-500/10 transition-all"
-                        >
-                            View More Offers
-                        </Link>
-                    </div>
-                </motion.div>
             </section>
-
-            {/* Mobile Floating Book Button */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-800 p-4 z-40">
-                <div className="flex items-center justify-between gap-4 max-w-7xl mx-auto">
-                    <div>
-                        <p className="text-xs text-gray-400">Special Price</p>
-                        <p className="text-2xl font-bold text-amber-400">
-                            ${formatPrice(basePrice)}
-                        </p>
-                    </div>
-                    <Link
-                        href={`/book?offer_id=${offer.id}`}
-                        className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-center py-3 rounded-xl font-semibold"
-                    >
-                        Grab Deal
-                    </Link>
-                </div>
-            </div>
 
             <Footer />
         </div>

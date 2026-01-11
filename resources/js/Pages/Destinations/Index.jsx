@@ -162,7 +162,7 @@ const DestinationsPage = ({ auth, destinations = [] }) => {
         currentPage * itemsPerPage
     );
 
-    const baseUrl = "/storage/";
+    const baseUrl = ""; 
 
     return (
         <div className="min-h-screen bg-gray-950 text-white">

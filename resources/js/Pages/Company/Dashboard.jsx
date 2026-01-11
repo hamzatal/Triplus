@@ -98,24 +98,15 @@ const formatISOToDateInput = (isoString) => {
         return "";
     }
 };
-
-// Calculate discount percentage
 const calculateDiscount = (original, discounted) => {
-    const originalPrice = parseFloat(original);
-    const discountedPrice = parseFloat(discounted);
+    if (!discounted || discounted === null || discounted === 0) return 0;
 
-    if (
-        isNaN(originalPrice) ||
-        isNaN(discountedPrice) ||
-        originalPrice <= 0 ||
-        discountedPrice >= originalPrice
-    ) {
-        return null;
-    }
-    const percentage = Math.round(
-        ((originalPrice - discountedPrice) / originalPrice) * 100
-    );
-    return percentage;
+    const orig = parseFloat(original);
+    const disc = parseFloat(discounted);
+
+    if (!orig || !disc || isNaN(orig) || isNaN(disc) || orig <= disc) return 0;
+
+    return Math.round(((orig - disc) / orig) * 100);
 };
 
 // Render stars

@@ -46,6 +46,12 @@ use App\Http\Controllers\CompanyAuth\CompanyOfferController;
 use App\Http\Controllers\CompanyAuth\CompanyPackageController;
 
 // ===================================================
+//! Middleware Imports
+// ===================================================
+
+use App\Http\Middleware\CheckOfferValidity;
+
+// ===================================================
 //! Authentication Routes (Keep Public)
 // ===================================================
 
@@ -66,6 +72,7 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+
 // ===================================================
 //! Company Authentication Routes (Public)
 // ===================================================
@@ -110,11 +117,21 @@ Route::middleware(['auth:web,company', 'verified'])->group(function () {
 Route::middleware(['auth:web', 'verified', 'active'])->group(function () {
     // User-specific booking routes
     Route::get('/UserBookings', [UserBookingsController::class, 'index'])->name('bookings.index');
-    Route::get('/book', [BookingController::class, 'create'])->name('book.create');
-    Route::post('/book', [BookingController::class, 'store'])->name('book.store');
+
+    // Booking routes with offer validity check
+    Route::get('/book', [BookingController::class, 'create'])
+        ->middleware(CheckOfferValidity::class)
+        ->name('book.create');
+
+    Route::post('/book', [BookingController::class, 'store'])
+        ->middleware(CheckOfferValidity::class)
+        ->name('book.store');
+
     Route::delete('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->middleware('auth:web');
+
     // Add rating route for regular users
     Route::post('/bookings/{bookingId}/rate', [UserBookingsController::class, 'submitRating'])->name('bookings.rate');
+
     // User profile page
     Route::get('/UserProfile', fn() => Inertia::render('UserProfile', ['user' => Auth::user()]))->name('UserProfile');
 
@@ -126,6 +143,7 @@ Route::middleware(['auth:web', 'verified', 'active'])->group(function () {
         Route::delete('/', [ProfileController::class, 'deactivate'])->name('deactivate');
         Route::post('/reactivate', [ProfileController::class, 'reactivate'])->name('reactivate');
     });
+
     // Favorite destinations, packages, and offers
     Route::post('/favorites', [FavoriteController::class, 'store'])->name('favorites.store');
     Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
@@ -227,7 +245,6 @@ Route::middleware(['auth:company', 'verified'])->prefix('company')->name('compan
     // Company authentication
     Route::post('/logout', [CompanyController::class, 'logout'])->name('logout');
 
-
     // Company dashboard and profile
     Route::get('/dashboard', [CompanyDashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [CompanyController::class, 'profile'])->name('profile');
@@ -238,6 +255,7 @@ Route::middleware(['auth:company', 'verified'])->prefix('company')->name('compan
     Route::post('/bookings/{bookingId}/rate', [UserBookingsController::class, 'submitRating'])->name('bookings.rate');
     Route::delete('/bookings/{id}/cancel', [CompanyDashboardController::class, 'cancelBooking'])->name('bookings.cancel');
     Route::patch('/bookings/{id}/confirm', [CompanyDashboardController::class, 'confirmBooking'])->name('bookings.confirm');
+
     // Company destinations management
     Route::prefix('destinations')->name('destinations.')->group(function () {
         Route::get('/', [CompanyDestinationController::class, 'index'])->name('index');

@@ -13,6 +13,26 @@ use Illuminate\Validation\ValidationException;
 
 class DestinationController extends Controller
 {
+    /**
+     * معالجة مسار الصورة بشكل صحيح
+     */
+    private function getImageUrl($image)
+    {
+        if (!$image) {
+            return null;
+        }
+
+        if (str_starts_with($image, 'http')) {
+            return $image;
+        }
+
+        if (str_starts_with($image, 'storage/')) {
+            return asset($image);
+        }
+
+        return Storage::url($image);
+    }
+
     public function index()
     {
         $destinations = Destination::with('company')->get();
@@ -25,7 +45,7 @@ class DestinationController extends Controller
                     'location' => $destination->location,
                     'category' => $destination->category,
                     'description' => $destination->description,
-                    'image' => $destination->image ? Storage::url($destination->image) : null,
+                    'image' => $this->getImageUrl($destination->image), // ✅ استخدام الدالة الجديدة
                     'price' => $destination->price,
                     'discount_price' => $destination->discount_price,
                     'rating' => $destination->rating,
@@ -190,7 +210,7 @@ class DestinationController extends Controller
                 'location' => $destination->location,
                 'category' => $destination->category,
                 'description' => $destination->description,
-                'image' => $destination->image ? Storage::url($destination->image) : null,
+                'image' => $this->getImageUrl($destination->image), // ✅ استخدام الدالة الجديدة
                 'price' => $destination->price,
                 'discount_price' => $destination->discount_price,
                 'rating' => $destination->rating,
@@ -225,7 +245,7 @@ class DestinationController extends Controller
                 'location' => $destination->location,
                 'category' => $destination->category,
                 'description' => $destination->description,
-                'image' => $destination->image ? Storage::url($destination->image) : null,
+                'image' => $this->getImageUrl($destination->image), // ✅ استخدام الدالة الجديدة
                 'price' => $destination->price,
                 'discount_price' => $destination->discount_price,
                 'rating' => $destination->rating,
@@ -272,7 +292,7 @@ class DestinationController extends Controller
                     'location' => $destination->location,
                     'category' => $destination->category,
                     'description' => $destination->description,
-                    'image' => $destination->image ? Storage::url($destination->image) : null,
+                    'image' => $this->getImageUrl($destination->image), // ✅ استخدام الدالة الجديدة
                     'price' => $destination->price,
                     'discount_price' => $destination->discount_price,
                     'rating' => $destination->rating,

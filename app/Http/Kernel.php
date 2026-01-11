@@ -47,5 +47,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'active' => \App\Http\Middleware\EnsureUserIsActive::class,
         'restrict.booking' => \App\Http\Middleware\RestrictBooking::class,
+        'check.offer.validity' => \App\Http\Middleware\CheckOfferValidity::class,
+
     ];
 }

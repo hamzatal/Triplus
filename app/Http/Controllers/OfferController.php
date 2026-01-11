@@ -8,13 +8,20 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class OfferController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
+        $today = Carbon::today();
+
         $offers = Offer::where('is_active', true)
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $today);
+            })
             ->with(['destination', 'company'])
             ->get()
             ->map(function ($offer) use ($user) {
@@ -23,6 +30,18 @@ class OfferController extends Controller
                     ->where('offer_id', $offer->id)
                     ->first()
                     : null;
+
+                // ✅ معالجة مسار الصورة
+                $imageUrl = null;
+                if ($offer->image) {
+                    if (str_starts_with($offer->image, 'http')) {
+                        $imageUrl = $offer->image;
+                    } elseif (str_starts_with($offer->image, 'storage/')) {
+                        $imageUrl = asset($offer->image);
+                    } else {
+                        $imageUrl = Storage::url($offer->image);
+                    }
+                }
 
                 return [
                     'id' => $offer->id,
@@ -34,7 +53,7 @@ class OfferController extends Controller
                     'discount_type' => $offer->discount_type ?? '',
                     'start_date' => $offer->start_date ? $offer->start_date->format('Y-m-d') : null,
                     'end_date' => $offer->end_date ? $offer->end_date->format('Y-m-d') : null,
-                    'image' => $offer->image, // شيل Storage::url() من هون
+                    'image' => $imageUrl, // ✅ استخدام المسار المعالج
                     'description' => $offer->description ?? '',
                     'rating' => $offer->rating ?? 0.0,
                     'is_active' => $offer->is_active ?? false,
@@ -66,17 +85,36 @@ class OfferController extends Controller
     public function show($id)
     {
         $user = Auth::user();
+        $today = Carbon::today();
+
         $offer = Offer::with(['destination', 'company'])->find($id);
 
         if (!$offer) {
             abort(404, 'Offer not found');
         }
 
+        $isExpired = $offer->end_date && Carbon::parse($offer->end_date)->lt($today);
+
         $favorite = $user
             ? Favorite::where('user_id', $user->id)
             ->where('offer_id', $offer->id)
             ->first()
             : null;
+
+        // معالجة مسار الصورة
+        $imageUrl = null;
+        if ($offer->image) {
+            if (str_starts_with($offer->image, 'http')) {
+                // الصورة رابط كامل
+                $imageUrl = $offer->image;
+            } elseif (str_starts_with($offer->image, 'storage/')) {
+                // الصورة في storage
+                $imageUrl = asset($offer->image);
+            } else {
+                // الصورة محفوظة بدون storage/ في البداية
+                $imageUrl = Storage::url($offer->image);
+            }
+        }
 
         $offerData = [
             'id' => $offer->id,
@@ -88,10 +126,11 @@ class OfferController extends Controller
             'discount_type' => $offer->discount_type ?? '',
             'start_date' => $offer->start_date ? $offer->start_date->format('Y-m-d') : null,
             'end_date' => $offer->end_date ? $offer->end_date->format('Y-m-d') : null,
-            'image' => $offer->image ? $offer->image : null,
+            'image' => $imageUrl,
             'description' => $offer->description ?? '',
             'rating' => $offer->rating ?? 0.0,
             'is_active' => $offer->is_active ?? false,
+            'is_expired' => $isExpired,
             'duration' => $offer->duration,
             'group_size' => $offer->group_size,
             'max_guests' => $offer->group_size,
@@ -134,4 +173,5 @@ class OfferController extends Controller
             return redirect()->route('offers.index')->with('error', 'Failed to toggle favorite.');
         }
     }
+    
 }
